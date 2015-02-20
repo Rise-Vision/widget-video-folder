@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Video Folder Widget</title>
+
+  <script src="components/webcomponentsjs/webcomponents.min.js"></script>
+  <link rel="import" href="components/web-component-rise-storage/rise-storage.html">
+
+  <!-- build:css css/video-folder.min.css -->
+  <link rel="stylesheet" type="text/css" href="widget/css/video-folder.css">
+  <link rel="stylesheet" type="text/css" href="components/widget-common/dist/css/background.css">
+  <!-- endbuild -->
+
+</head>
+<body>
+
+<rise-storage id="backgroundStorage"></rise-storage>
+
+<div id="background"></div>
+
+<!-- build:e2eMockData -->
+<!-- endbuild -->
+
+<!-- build:e2egadgets -->
+<script src="//rvashow2.appspot.com/gadgets/gadgets.min.js"></script>
+<!-- endbuild -->
+
+<!-- build:js js/widget.min.js -->
+<script src="config/config.js"></script>
+<script src="widget/video-folder.js"></script>
+<script src="components/widget-common/dist/background.js"></script>
+<script src="widget/main.js"></script>
+<script src="widget/analytics.js"></script>
+<!-- endbuild -->
+</body>
+</html>

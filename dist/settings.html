@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Video Folder Settings</title>
+
+  <link rel="stylesheet" href="css/settings.min.css"/>
+
+  <style type="text/css">
+    body, html {
+      background: transparent;
+    }
+  </style>
+
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.18/angular.min.js"></script>
+</head>
+<body ng-app="risevision.widget.video-folder.settings" ng-controller="settingsController">
+<div class="widget">
+  <div class="overlay"></div>
+  <div class="settings">
+    <div class="settings-center">
+      <div class="wrapper container modal-content" ng-controller="videoFolderSettingsController" ng-cloak>
+        <div class="modal-header">
+          <h2 id="settings-title"> {{"videoFolder.settings" | translate }}
+            <button id="settings-close" type="button" class="close" ng-click="closeSettings()">
+              <i class="fa fa-times"></i>
+            </button>
+          </h2>
+          <div class="sticky-wrapper">
+            <widget-button-toolbar
+              save="saveSettings()" cancel="closeSettings()" disable-save="settingsForm.$invalid"
+              contribute="https://github.com/Rise-Vision/widget-video-folder"></widget-button-toolbar>
+          </div>
+        </div>
+        <form role="form" name="settingsForm">
+          <!-- Background Image Setting -->
+          <div class="section">
+            <h5>{{"background.heading" | translate}}</h5>
+            <background-image-setting id="background" name="background"
+                                      background="settings.additionalParams.background"
+                                      company-id="{{settings.params.companyId}}"
+                                      ng-model="backgroundsetting" valid></background-image-setting>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+<script src="js/settings.min.js"></script>
+
+<!-- build:e2egadgets -->
+<script src="//rvashow2.appspot.com/gadgets/gadgets.min.js"></script>
+
+
+<script src="//s3.amazonaws.com/rise-common/scripts/i18next/i18next.min.js"></script>
+
+</body>
+</html>

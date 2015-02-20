@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Video Folder Settings</title>
+
+  <!-- build:css css/settings.min.css -->
+  <link rel="stylesheet" href="components/common-style/dist/css/rise.min.css">
+  <link rel="stylesheet" href="components/bootstrap-select/bootstrap-select.css">
+  <link rel="stylesheet" href="components/rv-bootstrap-formhelpers/dist/css/rv-bootstrap-formhelpers.css">
+  <link rel="stylesheet" href="components/rv-angular-bootstrap-colorpicker/css/colorpicker.css">
+  <!-- endbuild -->
+
+  <style type="text/css">
+    body, html {
+      background: transparent;
+    }
+  </style>
+
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.18/angular.min.js"></script>
+</head>
+<body ng-app="risevision.widget.video-folder.settings" ng-controller="settingsController">
+<div class="widget">
+  <div class="overlay"></div>
+  <div class="settings">
+    <div class="settings-center">
+      <div class="wrapper container modal-content" ng-controller="videoFolderSettingsController" ng-cloak>
+        <div class="modal-header">
+          <h2 id="settings-title"> {{"videoFolder.settings" | translate }}
+            <button id="settings-close" type="button" class="close" ng-click="closeSettings()">
+              <i class="fa fa-times"></i>
+            </button>
+          </h2>
+          <div class="sticky-wrapper">
+            <widget-button-toolbar
+              save="saveSettings()" cancel="closeSettings()" disable-save="settingsForm.$invalid"
+              contribute="https://github.com/Rise-Vision/widget-video-folder"></widget-button-toolbar>
+          </div>
+        </div>
+        <form role="form" name="settingsForm">
+          <!-- Background Image Setting -->
+          <div class="section">
+            <h5>{{"background.heading" | translate}}</h5>
+            <background-image-setting id="background" name="background"
+                                      background="settings.additionalParams.background"
+                                      company-id="{{settings.params.companyId}}"
+                                      ng-model="backgroundsetting" valid></background-image-setting>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+<!-- build:js js/settings.min.js -->
+<script src="components/angular-translate/angular-translate.js"></script>
+<script src="components/angular-translate-loader-static-files/angular-translate-loader-static-files.js"></script>
+<script src="components/rv-common-i18n/dist/i18n.js"></script>
+<script src="components/bootstrap-sass-official/assets/javascripts/bootstrap.js"></script>
+<script src="components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+<script src="components/bootstrap-select/bootstrap-select.js"></script>
+<script src="components/rv-bootstrap-formhelpers/dist/js/rv-bootstrap-formhelpers.js"></script>
+<script src="components/rv-angular-bootstrap-colorpicker/js/bootstrap-colorpicker-module.js"></script>
+
+<script src="components/widget-settings-ui-components/dist/js/angular/widget-button-toolbar.js"></script>
+<script src="components/widget-settings-ui-components/dist/js/angular/tooltip.js"></script>
+<script src="components/component-storage-selector/dist/storage-selector.js"></script>
+<script src="components/widget-settings-ui-components/dist/js/angular/url-field.js"></script>
+<script src="components/widget-settings-ui-components/dist/js/angular/position-setting.js"></script>
+<script src="components/widget-settings-ui-components/dist/js/angular/background-image-setting.js"></script>
+
+<script src="config/config.js"></script>
+<script src="settings/settings-app.js"></script>
+<script src="components/widget-settings-ui-core/dist/widget-settings-ui-core.js"></script>
+<script src="settings/ctr-video-folder-settings.js"></script>
+<!-- endbuild -->
+
+<!-- build:e2egadgets -->
+<script src="//rvashow2.appspot.com/gadgets/gadgets.min.js"></script>
+<!-- endbuild -->
+
+<script src="//s3.amazonaws.com/rise-common/scripts/i18next/i18next.min.js"></script>
+
+</body>
+</html>

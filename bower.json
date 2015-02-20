@@ -1,0 +1,52 @@
+{
+  "name": "widget-video-folder",
+  "version": "0.1.0",
+  "homepage": "https://github.com/Rise-Vision/widget-video-folder",
+  "authors": [
+    "Rise Vision"
+  ],
+  "description": "Rise Vision Video Folder Widget",
+  "moduleType": [
+    "node"
+  ],
+  "keywords": [
+    "risevision",
+    "ui",
+    "widget",
+    "video",
+    "folder"
+  ],
+  "license": "GPLv3",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "src/components",
+    "test",
+    "reports"
+  ],
+  "devDependencies": {
+    "angular-mocks": "1.2.18",
+    "q": "1.0.1",
+    "sinon": "~1.10.2"
+  },
+  "dependencies": {
+    "angular": "1.2.18",
+    "angular-bootstrap-slider": "~0.0.6",
+    "angular-route": "1.2.18",
+    "common-style": "https://github.com/Rise-Vision/common-style.git",
+    "rv-angular-bootstrap-colorpicker": "https://github.com/Rise-Vision/angular-bootstrap-colorpicker.git#3.0.14",
+    "ui-bootstrap": "~0.11.0",
+    "webcomponentsjs": "~0.5.2",
+    "web-component-rise-storage": "https://github.com/Rise-Vision/web-component-rise-storage.git#0.1.5",
+    "widget-common": "https://github.com/Rise-Vision/widget-common.git#0.1.1",
+    "widget-settings-ui-components": "https://github.com/Rise-Vision/widget-settings-ui-components.git#0.1.9",
+    "widget-settings-ui-core": "https://github.com/Rise-Vision/widget-settings-ui-core.git#0.1.8"
+  },
+  "resolutions": {
+    "angular-translate": "~2.4.2",
+    "angular-translate-loader-static-files": "~2.4.2",
+    "jquery": "1.11.0",
+    "common-style": "~1.1.11"
+  }
+}
