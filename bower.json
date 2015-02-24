@@ -40,12 +40,10 @@
     "webcomponentsjs": "~0.5.2",
     "web-component-rise-storage": "https://github.com/Rise-Vision/web-component-rise-storage.git#0.1.5",
     "widget-common": "https://github.com/Rise-Vision/widget-common.git#0.1.1",
-    "widget-settings-ui-components": "https://github.com/Rise-Vision/widget-settings-ui-components.git#0.1.9",
-    "widget-settings-ui-core": "https://github.com/Rise-Vision/widget-settings-ui-core.git#0.1.8"
+    "widget-settings-ui-components": "https://github.com/Rise-Vision/widget-settings-ui-components.git#0.1.10",
+    "widget-settings-ui-core": "https://github.com/Rise-Vision/widget-settings-ui-core.git#0.1.10"
   },
   "resolutions": {
-    "angular-translate": "~2.4.2",
-    "angular-translate-loader-static-files": "~2.4.2",
     "jquery": "1.11.0",
     "common-style": "~1.1.11"
   }
