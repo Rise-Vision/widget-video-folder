@@ -20,7 +20,6 @@
   var bower = require("gulp-bower");
   var del = require("del");
   var colors = require("colors");
-  var htmlreplace = require("gulp-html-replace");
 
   var appJSFiles = [
     "src/**/*.js",

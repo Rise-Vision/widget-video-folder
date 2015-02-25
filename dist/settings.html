@@ -10,6 +10,11 @@
     body, html {
       background: transparent;
     }
+
+    .text-validation {
+      margin-top: -15px;
+    }
+
   </style>
 
   <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.18/angular.min.js"></script>
@@ -21,7 +26,7 @@
     <div class="settings-center">
       <div class="wrapper container modal-content" ng-controller="videoFolderSettingsController" ng-cloak>
         <div class="modal-header">
-          <h2 id="settings-title"> {{"videoFolder.settings" | translate }}
+          <h2 id="settings-title"> {{"widget-video-folder.settings" | translate }}
             <button id="settings-close" type="button" class="close" ng-click="closeSettings()">
               <i class="fa fa-times"></i>
             </button>
@@ -33,11 +38,44 @@
           </div>
         </div>
         <form role="form" name="settingsForm">
+          <!-- URL -->
+          <url-field name="videoFolderUrl" url="settings.additionalParams.url"
+                     company-id="{{settings.params.companyId}}"
+                     ng-model="urlentry" valid></url-field>
+          <p id="folder-error" class="text-danger text-validation" ng-show="!isFolder">
+            {{"widgets.errors.storage-folder" | translate}}
+          </p>
+          <!-- Order -->
+          <div class="form-group">
+            <order order="settings.additionalParams.order"></order>
+          </div>
+          <!-- Pause -->
+          <div class="form-group">
+            <label>{{"widgets.pause.label" | translate}}</label>
+            <span popover="{{'widgets.pause.tooltip' | translate}}" popover-trigger="click" popover-placement="right" rv-tooltip></span>
+            <div class="row">
+              <div class="col-xs-6 col-md-3">
+                <div class="input-group">
+                  <input type="text" class="form-control" ng-model="settings.additionalParams.pause">
+                  <span class="input-group-addon">{{"common.units.seconds" | translate}}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Autohide -->
+          <div class="form-group">
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" ng-model="settings.additionalParams.autoHide"> {{"widgets.auto-hide" | translate}}
+              </label>
+            </div>
+          </div>
+          <!-- Video Setting -->
+          <video-setting video="settings.additionalParams.video"></video-setting>
           <!-- Background Image Setting -->
           <div class="section">
             <h5>{{"background.heading" | translate}}</h5>
-            <background-image-setting id="background" name="background"
-                                      background="settings.additionalParams.background"
+            <background-image-setting background="settings.additionalParams.background"
                                       company-id="{{settings.params.companyId}}"
                                       ng-model="backgroundsetting" valid></background-image-setting>
           </div>
