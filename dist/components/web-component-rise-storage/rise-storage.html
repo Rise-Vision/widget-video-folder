@@ -3,7 +3,7 @@
 
 <script src="../../components/underscore/underscore.js"></script>
 
-<polymer-element name="rise-storage" attributes="companyId folder fileName fileType contentType folderRefresh sort sortDirection">
+<polymer-element name="rise-storage" attributes="companyId folder fileName fileType contentType refresh sort sortDirection">
   <template>
     <core-ajax id="storage"
       url="{{url}}"
@@ -83,11 +83,11 @@
       /**
        * The number of seconds before the folder will be checked for changes.
        *
-       * @attribute folderRefresh
+       * @attribute refresh
        * @type number
        * @default 0 (no refresh)
        */
-      folderRefresh: 0,
+      refresh: 0,
 
       /**
        * The order in which files are sorted.
@@ -116,7 +116,7 @@
        */
       url: "",
 
-       /**
+      /**
        * Whether or not Rise Cache is running.
        *
        * @property isCacheRunning
@@ -124,6 +124,15 @@
        * @default false
        */
       isCacheRunning: false,
+
+      /**
+       * Whether or not a response has been received from the ping request.
+       *
+       * @property pingReceived
+       * @type boolean
+       * @default false
+       */
+      pingReceived: false,
 
       /**
        * Polymer has finished its initialization. This is the entry point.
@@ -184,15 +193,16 @@
       startTimer: function() {
         // Don't refresh individual files.
         if (!this.fileName) {
-          this.folderRefresh = parseInt(this.folderRefresh, 10);
+          this.refresh = parseInt(this.refresh, 10);
 
-          if (!isNaN(this.folderRefresh) && this.folderRefresh !== 0) {
-            this.folderRefresh = (this.folderRefresh < 15) ? 15 : this.folderRefresh;
+          if (!isNaN(this.refresh) && this.refresh !== 0) {
+            this.refresh = (this.refresh < 15) ? 15 : this.refresh;
 
             this.job("refresh", function() {
+              this.pingReceived = false;
               this.$.ping.go();
               this.startTimer();
-            }, this.folderRefresh * 60000);
+            }, this.refresh * 60000);
           }
         }
       },
@@ -338,8 +348,9 @@
        * Fired when an error is received from Storage.
        */
       handleStorageError: function(e, resp) {
-        this.fire("rise-storage-error", resp);
         console.log("Storage Error: " + resp.xhr.status + " " + resp.xhr.statusText);
+
+        this.fire("rise-storage-error", resp);
       },
 
       /**
@@ -353,6 +364,7 @@
           this.isCacheRunning = true;
         }
 
+        this.pingReceived = true;
         this.go();
       },
 
@@ -360,9 +372,11 @@
        * Fired when an error is received from Rise Cache.
        */
       handlePingError: function(e, resp) {
-        this.isCacheRunning = false;
-        this.go();
         console.log("Ping Error: " + resp.xhr.status + " " + resp.xhr.statusText);
+
+        this.isCacheRunning = false;
+        this.pingReceived = true;
+        this.go();
       },
 
       /**
@@ -371,8 +385,10 @@
        * @method go
        */
       go: function() {
-        this.setUrl();
-        this.$.storage.go();
+        if (this.pingReceived) {
+          this.setUrl();
+          this.$.storage.go();
+        }
       }
     });
   </script>

@@ -8,7 +8,6 @@ RiseVision.VideoFolder = (function (document, gadgets) {
 
   var _prefs = null,
     _additionalParams = {},
-    _companyId = null,
     _background = null;
 
   /*
@@ -35,16 +34,12 @@ RiseVision.VideoFolder = (function (document, gadgets) {
 
   }
 
-  function setCompanyId(value) {
-    _companyId = value;
-  }
-
   function setAdditionalParams(params) {
     _prefs = new gadgets.Prefs();
     _additionalParams = params;
 
     // create and initialize the Background instance
-    _background = new RiseVision.Common.Background(_additionalParams, _companyId);
+    _background = new RiseVision.Common.Background(_additionalParams);
     _background.init(_backgroundReady);
   }
 
@@ -55,7 +50,6 @@ RiseVision.VideoFolder = (function (document, gadgets) {
   return {
     "pause": pause,
     "play": play,
-    "setCompanyId": setCompanyId,
     "setAdditionalParams": setAdditionalParams,
     "stop": stop
   };

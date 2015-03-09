@@ -28407,7 +28407,12 @@ angular.module("risevision.widget.common.storage-selector")
     $scope.storageUrl = storageUrl;
 
     $window.addEventListener("message", function (event) {
-      if (event.origin !== "http://storage.risevision.com") { return; }
+      var storageTest = "storage-stage.risevision.com",
+        storageProd = "storage.risevision.com";
+
+      if (event.origin.indexOf(storageTest) === -1 && event.origin.indexOf(storageProd) === -1) {
+        return;
+      }
 
       if (Array.isArray(event.data)) {
         $modalInstance.close(event.data);
@@ -28825,6 +28830,7 @@ app.run(["$templateCache", function($templateCache) {
         link: function ($scope) {
           $scope.defaultSetting = {
             autoplay: true,
+            scaleToFit: true,
             volume: 50
           };
 
@@ -28860,16 +28866,21 @@ app.run(["$templateCache", function($templateCache) {
   $templateCache.put("_angular/video-setting/video-setting.html",
     "<div class=\"section\">\n" +
     "  <h5>{{\"video.heading\" | translate}}</h5>\n" +
+    "  <div class=\"form-group\">\n" +
+    "    <div class=\"checkbox\">\n" +
+    "      <label>\n" +
+    "        <input name=\"video-autoplay\" type=\"checkbox\" ng-model=\"video.autoplay\"> {{\"video.autoplay.label\" | translate}}\n" +
+    "      </label>\n" +
+    "    </div>\n" +
+    "  </div>\n" +
     "  <div class=\"checkbox\">\n" +
     "    <label>\n" +
-    "      <input name=\"video-autoplay\" type=\"checkbox\" ng-model=\"video.autoplay\"> {{\"video.autoplay.label\" | translate}}\n" +
+    "      <input name=\"video-scale\" type=\"checkbox\" ng-model=\"video.scaleToFit\"> {{\"widgets.scale-to-fit\" | translate}}\n" +
     "    </label>\n" +
     "  </div>\n" +
-    "  <div class=\"form-group\">\n" +
-    "    <label>{{\"video.volume.label\" | translate}}</label>\n" +
-    "    <div>\n" +
-    "      <slider orientation=\"horizontal\" handle=\"round\" ng-model=\"video.volume\" min=\"0\" step=\"1\" max=\"100\"></slider>\n" +
-    "    </div>\n" +
+    "  <label>{{\"video.volume.label\" | translate}}</label>\n" +
+    "  <div>\n" +
+    "    <slider orientation=\"horizontal\" handle=\"round\" ng-model=\"video.volume\" min=\"0\" step=\"1\" max=\"100\"></slider>\n" +
     "  </div>\n" +
     "</div>\n" +
     "");
@@ -29024,19 +29035,40 @@ angular.module("risevision.widget.common")
 });
 
 angular.module("risevision.widget.common")
-  .constant("STORAGE_URL_BASE", "storage.googleapis.com/risemedialibrary-")
-  .factory("commonSettings", ["$log", "STORAGE_URL_BASE", function ($log, STORAGE_URL_BASE) {
+  .constant("STORAGE_FILE_URL_BASE", "storage.googleapis.com/risemedialibrary-")
+  .constant("STORAGE_FOLDER_URL_BASE", "googleapis.com/storage/")
+  .factory("commonSettings", ["$log", "STORAGE_FILE_URL_BASE", "STORAGE_FOLDER_URL_BASE",
+    function ($log, STORAGE_FILE_URL_BASE, STORAGE_FOLDER_URL_BASE) {
 
     var factory = {
       getStorageUrlData: function (url) {
         var storage = {},
           str, arr, params, pair;
 
-        if (url.indexOf(STORAGE_URL_BASE) !== -1) {
-          str = url.split(STORAGE_URL_BASE)[1];
+        function getStorageType(storageUrl) {
+          if (storageUrl.indexOf(STORAGE_FILE_URL_BASE) !== -1) {
+            return "file";
+          }
+
+          if (storageUrl.indexOf(STORAGE_FOLDER_URL_BASE) !== -1) {
+            return "folder";
+          }
+
+          return null;
+        }
+
+        function getCompanyId(storageUrl) {
+          var p = storageUrl.split("risemedialibrary-");
+
+          return p[1].slice(0, p[1].indexOf("/"));
+        }
+
+        if (getStorageType(url) === "file") {
+          str = url.split(STORAGE_FILE_URL_BASE)[1];
           str = decodeURIComponent(str.slice(str.indexOf("/") + 1));
           arr = str.split("/");
 
+          storage.companyId = getCompanyId(url);
           storage.fileName = arr.pop();
           storage.folder = arr.length > 0 ? arr.join("/") : "";
 
@@ -29045,14 +29077,14 @@ angular.module("risevision.widget.common")
             storage.folder += "/";
           }
         }
-        // Check if a folder was selected.
-        else {
+        else if (getStorageType(url) === "folder") {
           params = url.split("?");
 
           for (var i = 0; i < params.length; i++) {
             pair = params[i].split("=");
 
             if (pair[0] === "prefix" && typeof pair[1] !== "undefined" && pair[1] !== "") {
+              storage.companyId = getCompanyId(url);
               storage.folder = decodeURIComponent(pair[1]);
               storage.fileName = "";
               break;
