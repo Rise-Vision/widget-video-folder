@@ -8,7 +8,8 @@ RiseVision.VideoFolder = (function (document, gadgets) {
 
   var _prefs = null,
     _additionalParams = {},
-    _background = null;
+    _background = null,
+    _slider = null;
 
   /*
    *  Private Methods
@@ -19,8 +20,9 @@ RiseVision.VideoFolder = (function (document, gadgets) {
   }
 
   function _backgroundReady() {
-    // TODO: continue development of playing videos from here, temporarily call _ready()
-    _ready();
+    // create and initialize the Player instance
+    _slider = new RiseVision.VideoFolder.Slider(_additionalParams);
+    _slider.init();
   }
 
   /*
@@ -37,10 +39,18 @@ RiseVision.VideoFolder = (function (document, gadgets) {
   function setAdditionalParams(params) {
     _prefs = new gadgets.Prefs();
     _additionalParams = params;
+    _additionalParams.width = _prefs.getInt("rsW");
+    _additionalParams.height = _prefs.getInt("rsH");
+
+    document.getElementById("container").style.height = _prefs.getInt("rsH") + "px";
 
     // create and initialize the Background instance
     _background = new RiseVision.Common.Background(_additionalParams);
     _background.init(_backgroundReady);
+  }
+
+  function sliderReady() {
+    _ready();
   }
 
   function stop() {
@@ -51,6 +61,7 @@ RiseVision.VideoFolder = (function (document, gadgets) {
     "pause": pause,
     "play": play,
     "setAdditionalParams": setAdditionalParams,
+    "sliderReady": sliderReady,
     "stop": stop
   };
 

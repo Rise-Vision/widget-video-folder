@@ -8,22 +8,38 @@
   <script src="components/webcomponentsjs/webcomponents.min.js"></script>
   <link rel="import" href="components/web-component-rise-storage/rise-storage.html">
 
+  <link rel="stylesheet" href="//s3.amazonaws.com/rise-common/scripts/slider-revolution/css/style.css">
+  <link rel="stylesheet" href="//s3.amazonaws.com/rise-common/scripts/slider-revolution/css/settings.css">
+
   <link rel="stylesheet" href="css/video-folder.min.css"/>
 
 </head>
 <body>
 
-<rise-storage id="backgroundStorage"></rise-storage>
+  <rise-storage id="backgroundStorage"></rise-storage>
+  <rise-storage id="videoFolderStorage"></rise-storage>
 
-<div id="background"></div>
+  <div id="background"></div>
+  <div id="container">
+    <div class="tp-banner-container">
+      <div class="tp-banner"></div>
+    </div>
+  </div>
 
-<!-- build:e2eMockData -->
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  <script src="//s3.amazonaws.com/rise-common/scripts/slider-revolution/js/jquery.themepunch.tools.min.js"></script>
+  <script src="//s3.amazonaws.com/rise-common/scripts/slider-revolution/js/jquery.themepunch.revolution.min.js"></script>
 
+  <!-- build:e2eMockData -->
+  
 
-<!-- build:e2egadgets -->
-<script src="//rvashow2.appspot.com/gadgets/gadgets.min.js"></script>
+  <!-- build:e2eStorageMock -->
+  
 
+  <!-- build:e2egadgets -->
+  <script src="//rvashow2.appspot.com/gadgets/gadgets.min.js"></script>
+  
 
-<script src="js/widget.min.js"></script>
+  <script src="js/widget.min.js"></script>
 </body>
 </html>

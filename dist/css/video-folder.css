@@ -42,6 +42,8 @@ Custom Styling
 body {
   /* Visual */
   background-color: transparent;
+  margin: 0;
+  padding: 0;
 }
 
 #background {

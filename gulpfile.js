@@ -83,7 +83,7 @@
   });
 
   gulp.task("images", function() {
-    return gulp.src("src/components/rv-bootstrap-formhelpers/img/bootstrap-formhelpers-googlefonts.png")
+    gulp.src("src/components/rv-bootstrap-formhelpers/img/bootstrap-formhelpers-googlefonts.png")
       .pipe(gulp.dest("dist/img"));
   });
 
@@ -114,7 +114,9 @@
   gulp.task("html:e2e",
     factory.htmlE2E({
       files: ["./src/settings.html", "./src/widget.html"],
-      e2eMockData: "../test/mock-data.js"
+      e2egadgets: "../node_modules/widget-tester/mocks/gadget-mocks.js",
+      e2eMockData: "../test/mock-data.js",
+      e2eStorageMock: "../node_modules/widget-tester/mocks/rise-storage-mock.js"
     }));
 
   gulp.task("test:e2e:run", ["webdriver_update"], factory.testE2EAngular({
