@@ -100,6 +100,7 @@
         additionalParams: {
           "url": validStorageFolderUrl,
           "storage": {
+            "companyId": "abc123",
             "folder": "videos/",
             "fileName": ""
           },
@@ -108,6 +109,7 @@
           "autoHide": false,
           "video": {
             "autoplay":true,
+            "scaleToFit": true,
             "volume":50
           },
           "background": {

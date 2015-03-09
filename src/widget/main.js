@@ -31,23 +31,13 @@
     }
   }
 
-  function companyId(name, value) {
-    if (name && name === "companyId") {
-      RiseVision.VideoFolder.setCompanyId(value);
-    }
-
-    gadgets.rpc.register("rsparam_set_" + id, additionalParams);
-    gadgets.rpc.call("", "rsparam_get", null, id, ["additionalParams"]);
-  }
-
   if (id && id !== "") {
     gadgets.rpc.register("rscmd_play_" + id, play);
     gadgets.rpc.register("rscmd_pause_" + id, pause);
     gadgets.rpc.register("rscmd_stop_" + id, stop);
-    gadgets.rpc.register("rsparam_set_" + id, companyId);
 
-    gadgets.rpc.call("", "rsparam_get", null, id, "companyId");
-
+    gadgets.rpc.register("rsparam_set_" + id, additionalParams);
+    gadgets.rpc.call("", "rsparam_get", null, id, ["additionalParams"]);
   }
 
 })(window, gadgets);
