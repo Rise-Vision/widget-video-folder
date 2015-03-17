@@ -12,15 +12,15 @@
   };
 
   function play() {
-
+    RiseVision.VideoFolder.play();
   }
 
   function pause() {
-
+    RiseVision.VideoFolder.pause();
   }
 
   function stop() {
-
+    RiseVision.VideoFolder.stop();
   }
 
   function additionalParams(names, values) {

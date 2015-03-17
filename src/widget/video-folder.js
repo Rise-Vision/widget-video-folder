@@ -14,6 +14,10 @@ RiseVision.VideoFolder = (function (document, gadgets) {
   /*
    *  Private Methods
    */
+  function _done() {
+    gadgets.rpc.call("", "rsevent_done", null, _prefs.getString("id"));
+  }
+
   function _ready() {
     gadgets.rpc.call("", "rsevent_ready", null, _prefs.getString("id"),
       true, true, true, true, true);
@@ -29,11 +33,11 @@ RiseVision.VideoFolder = (function (document, gadgets) {
    *  Public Methods
    */
   function pause() {
-
+    _slider.pause();
   }
 
   function play() {
-
+    _slider.play();
   }
 
   function setAdditionalParams(params) {
@@ -49,18 +53,23 @@ RiseVision.VideoFolder = (function (document, gadgets) {
     _background.init(_backgroundReady);
   }
 
+  function sliderDone() {
+    _done();
+  }
+
   function sliderReady() {
     _ready();
   }
 
   function stop() {
-
+    pause();
   }
 
   return {
     "pause": pause,
     "play": play,
     "setAdditionalParams": setAdditionalParams,
+    "sliderDone": sliderDone,
     "sliderReady": sliderReady,
     "stop": stop
   };

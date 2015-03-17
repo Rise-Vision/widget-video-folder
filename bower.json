@@ -36,6 +36,7 @@
     "angular-route": "1.2.18",
     "common-style": "https://github.com/Rise-Vision/common-style.git",
     "rv-angular-bootstrap-colorpicker": "https://github.com/Rise-Vision/angular-bootstrap-colorpicker.git#3.0.14",
+    "rv-anythingslider": "https://github.com/Rise-Vision/AnythingSlider.git#1.9.5",
     "ui-bootstrap": "~0.11.0",
     "webcomponentsjs": "~0.5.2",
     "web-component-rise-storage": "https://github.com/Rise-Vision/web-component-rise-storage.git#0.1.7",

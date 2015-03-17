@@ -1,40 +1,73 @@
 var RiseVision = RiseVision || {};
 RiseVision.VideoFolder = RiseVision.VideoFolder || {};
 
-RiseVision.VideoFolder.Slider = function (params) {
+RiseVision.VideoFolder.Slider = function (data) {
   "use strict";
 
   var _storage = document.getElementById("videoFolderStorage"),
     _currentUrls = null,
     _initialBuild = true,
-    _$revolution = null;
+    _$api = null;
 
   /*
    *  Private Methods
    */
-  function _getDataVideoAttr(url) {
-    var attr = null,
+  function _getVideoFileType(url) {
+    var type = null,
       str = url.substr(url.lastIndexOf(".") + 1),
       arr = str.split("?");
 
     if (typeof arr[0] !== "undefined" && arr[0] !== "") {
-      switch(arr[0]) {
-        case "mp4":
-          attr = "data-videomp4";
-          break;
-        case "webm":
-          attr = "data-videowebm";
-          break;
-        case "ogg":
-        case "ogv":
-          attr = "data-videoogv";
-          break;
-        default:
-          attr = null;
+      type = arr[0];
+
+      if (type === "ogv") {
+        type = "ogg";
       }
     }
 
-    return attr;
+    return type;
+  }
+
+  function _addVideos() {
+    var list = document.querySelector("#container ul"),
+      fragment = document.createDocumentFragment(),
+      items = [],
+      item = null;
+
+    _currentUrls.forEach(function(url, index) {
+      var videoContainer = document.createElement("div"),
+        video = document.createElement("video"),
+        source = document.createElement("source");
+
+      item = document.createElement("li");
+      item.setAttribute("class", "panel" + (index + 1));
+
+      videoContainer.setAttribute("class", "video-container");
+
+      // To be consistent with Video Widget, basing use of controls on user selection of "Autoplay"
+      if (data.video.autoplay) {
+        video.setAttribute("controls", "");
+      }
+
+      // set initial volume on <video>
+      video.volume = data.video.volume / 100;
+
+      // set the "type" attribute on <source>
+      source.setAttribute("type", "video/" + _getVideoFileType(url));
+      source.setAttribute("src", url);
+
+      video.appendChild(source);
+      videoContainer.appendChild(video);
+      item.appendChild(videoContainer);
+
+      items.push(item);
+    });
+
+    items.forEach(function(item) {
+      fragment.appendChild(item);
+    });
+
+    list.appendChild(fragment);
   }
 
   function _getStorageSort(order) {
@@ -71,145 +104,34 @@ RiseVision.VideoFolder.Slider = function (params) {
     return value;
   }
 
-  function _addSlides() {
-    var list = document.querySelector(".tp-banner ul"),
-      fragment = document.createDocumentFragment(),
-      slides = [],
-      slide = null;
-
-    _currentUrls.forEach(function(url) {
-      var image = document.createElement("img"),
-        video = document.createElement("div"),
-        videoAttr = _getDataVideoAttr(url);
-
-      slide = document.createElement("li");
-
-      // Slide Transition
-      slide.setAttribute("data-transition", "slidehorizontal");
-      slide.setAttribute("data-masterspeed", 1000);
-      slide.setAttribute("data-slotamount", 1);
-
-      // Transition image, using 1 pixel transparent to prevent error
-      image.src = "https://s3.amazonaws.com/Rise-Images/UI/FFFFFF-0.0.png";
-      image.setAttribute("data-bgfit", "cover");
-      image.setAttribute("data-bgrepeat", "no-repeat");
-      image.setAttribute("data-bgposition", "center center");
-
-      // Video
-      video.setAttribute("class", "tp-caption tp-fade fadeout fullscreenvideo tp-videolayer");
-      video.setAttribute("data-x", 0);
-      video.setAttribute("data-y", 0);
-      video.setAttribute("data-speed", 1000);
-      video.setAttribute("data-start", 1100);
-      video.setAttribute("data-easing", "Power4.easeOut");
-      video.setAttribute("data-elementdelay", 0.01);
-      video.setAttribute("data-endelementdelay", 0.1);
-      video.setAttribute("data-endspeed", 1500);
-      video.setAttribute("data-endeasing", "Power4.easeIn");
-      video.setAttribute("data-autoplay", "false");
-      video.setAttribute("data-autoplayonlyfirsttime", "false");
-      video.setAttribute("data-nextslideatend", "true");
-      video.setAttribute("data-videowidth", "100%");
-      video.setAttribute("data-videoheight", "100%");
-      video.setAttribute("data-ytid", "");
-      video.setAttribute("data-vimeoid", "");
-      video.setAttribute("data-videoattributes", "");
-      video.setAttribute("data-videopreload", "meta");
-      video.setAttribute("data-videoloop", "none");
-      video.setAttribute("data-forcecover", 1);
-      video.setAttribute("data-forcerewind", "on");
-      video.setAttribute("data-aspectratio", "16:9");
-
-      // Configure the correct data-video based on file type
-
-      if (videoAttr === "data-videoogv") {
-        // When ogv, Revolution seems to also require data-videowebm even though its an empty value
-        video.setAttribute(_getDataVideoAttr(url), url);
-        video.setAttribute("data-videowebm", "");
-      } else if (videoAttr === "data-videowebm") {
-        video.setAttribute(_getDataVideoAttr(url), url);
-        // Bug with Revolution slider, seems to require data-videoogv with the url value to work
-        video.setAttribute("data-videoogv", url);
-      } else {
-        video.setAttribute(_getDataVideoAttr(url), url);
-      }
-
-      /*
-      To be consistent with Video Widget, basing use of controls on user selection of "Autoplay".
-      However, Revolution plugin inherently provides additional play/pause ability via touch or click of the video.
-       */
-      if (params.video.autoplay) {
-        video.setAttribute("data-videocontrols", "controls");
-      } else {
-        video.setAttribute("data-videocontrols", "none");
-      }
-
-      // TODO: Revolution only offers ability to set volume to mute, can't set specific volume
-      //video.setAttribute("data-volume", "mute");
-
-      // Scale to Fit
-      // TODO: Figure out if this should be removed as a setting or not
-
-      slide.appendChild(image);
-      slide.appendChild(video);
-      slides.push(slide);
-    });
-
-    slides.forEach(function(slide) {
-      fragment.appendChild(slide);
-    });
-
-    list.appendChild(fragment);
-  }
-
   function _configurePlugin(urls) {
-    var tpBanner = document.querySelector(".tp-banner"),
+    var container = document.getElementById("container"),
+      fragment = document.createDocumentFragment(),
       ul = document.createElement("ul");
 
-    tpBanner.appendChild(ul);
+    ul.setAttribute("id", "slider");
+    fragment.appendChild(ul);
+    container.appendChild(fragment);
 
     _currentUrls = urls;
-    _addSlides();
+    _addVideos();
 
-    _$revolution = $(".tp-banner").revolution({
-      delay:9000,
-      startwidth:params.width,
-      startheight:params.height,
-      navigationType:"none",
-      touchenabled:"on",
-      onHoverStop:"on",
+    $("#slider")
+      .anythingSlider({
+        expand       : true,
+        autoPlay     : false,
+        buildArrows  : true,
+        buildStartStop : false,
+        buildNavigation : false,
+        appendForwardTo     : null,
+        appendBackTo        : null
+      });
 
-      swipe_velocity: 0.7,
-      swipe_min_touches: 1,
-      swipe_max_touches: 1,
-
-      keyboardNavigation:"off",
-
-      shadow:0,
-      fullWidth:"off",
-      fullScreen:"off",
-
-      stopLoop:"off",
-      stopAfterLoops:-1,
-      stopAtSlide:-1,
-
-      shuffle:"off",
-
-      forceFullWidth:"off",
-      fullScreenAlignForce:"off",
-
-      hideTimerBar: "on",
-
-      hideSliderAtLimit:0,
-      hideCaptionAtLimit:0,
-      hideAllCaptionAtLilmit:0
-    });
-
-    RiseVision.VideoFolder.sliderReady();
+    _$api = $("#slider").data("AnythingSlider");
   }
 
   function _configureStorage() {
-    var storageSort = _getStorageSort(params.order);
+    var storageSort = _getStorageSort(data.order);
 
     _storage.addEventListener("rise-storage-response", function(e) {
       if (_initialBuild) {
@@ -219,8 +141,8 @@ RiseVision.VideoFolder.Slider = function (params) {
       }*/
     });
 
-    _storage.setAttribute("companyId", params.storage.companyId);
-    _storage.setAttribute("folder", params.storage.folder);
+    _storage.setAttribute("companyId", data.storage.companyId);
+    _storage.setAttribute("folder", data.storage.folder);
     _storage.setAttribute("sort", storageSort.sort);
     _storage.setAttribute("sortDirection", storageSort.direction);
     _storage.go();
@@ -235,7 +157,17 @@ RiseVision.VideoFolder.Slider = function (params) {
     }
   }
 
+  function pause() {
+
+  }
+
+  function play() {
+
+  }
+
   return {
-    "init": init
+    "init": init,
+    "pause": pause,
+    "play": play
   };
 };
