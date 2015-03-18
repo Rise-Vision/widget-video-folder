@@ -7,11 +7,14 @@ RiseVision.VideoFolder.Slider = function (data) {
   "use strict";
 
   var _storage = document.getElementById("videoFolderStorage"),
+    _sliderContainer = document.getElementById("container"),
     _currentFiles = null,
     _newFiles = null,
     _initialBuild = true,
     _$api = null,
-    _refreshWaiting = false;
+    _apiInitialized = false,
+    _refreshWaiting = false,
+    _videosReady = 0;
 
   /*
    *  Private Methods
@@ -30,6 +33,26 @@ RiseVision.VideoFolder.Slider = function (data) {
     }
 
     return type;
+  }
+
+  function _isSliderReady() {
+    if (_currentFiles && _currentFiles.length) {
+      if (_currentFiles.length === _videosReady && _apiInitialized) {
+        RiseVision.VideoFolder.sliderReady();
+      }
+    }
+  }
+
+  function _onCanPlay(e) {
+    e.target.removeEventListener("canplay", _onCanPlay, false);
+
+    // first video can play a couple frames, now it won't visually look ugly to show
+    _sliderContainer.style.visibility = "visible";
+  }
+
+  function _onCanPlayThrough() {
+    _videosReady += 1;
+    _isSliderReady();
   }
 
   function _addVideos() {
@@ -55,6 +78,14 @@ RiseVision.VideoFolder.Slider = function (data) {
 
       // set initial volume on <video>
       video.volume = data.video.volume / 100;
+
+      // video events
+      if (index === 0) {
+        // add this listener only for the first video that will show
+        video.addEventListener("canplay", _onCanPlay, false);
+      }
+
+      video.addEventListener("canplaythrough", _onCanPlayThrough, false);
 
       // set the "type" attribute on <source>
       source.setAttribute("type", "video/" + _getVideoFileType(file.url));
@@ -128,7 +159,19 @@ RiseVision.VideoFolder.Slider = function (data) {
         buildStartStop : false,
         buildNavigation : false,
         appendForwardTo     : null,
-        appendBackTo        : null
+        appendBackTo        : null,
+        onInitialized: function () {
+          _apiInitialized = true;
+
+          _isSliderReady();
+        },
+        // pause video when out of view
+        onSlideInit: function(e, slider) {
+          var vid = slider.$lastPage.find("video");
+          if (vid.length && typeof(vid[0].pause) !== "undefined") {
+            vid[0].pause();
+          }
+        }
       });
 
     _$api = $("#slider").data("AnythingSlider");
@@ -143,6 +186,7 @@ RiseVision.VideoFolder.Slider = function (data) {
           _configurePlugin(e.detail.files);
         } else {
           if (!_.isEqual(_currentFiles, e.detail.files)) {
+            // TODO: refresh needs to happen based on if video playing or not
             _newFiles = e.detail.files;
             _refreshWaiting = true;
           }

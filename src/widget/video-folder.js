@@ -47,6 +47,7 @@ RiseVision.VideoFolder = (function (document, gadgets) {
     _additionalParams.height = _prefs.getInt("rsH");
 
     document.getElementById("container").style.height = _prefs.getInt("rsH") + "px";
+    document.getElementById("preloader").style.height = _prefs.getInt("rsH") + "px";
 
     // create and initialize the Background instance
     _background = new RiseVision.Common.Background(_additionalParams);

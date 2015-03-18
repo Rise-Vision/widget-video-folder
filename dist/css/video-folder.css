@@ -66,6 +66,7 @@ body {
   /* Prevent FOUC (see FAQ page) and keep things readable if javascript is disabled */
   overflow-y: auto;
   overflow-x: hidden;
+  visibility: hidden;
 }
 
 .video-container {
@@ -80,6 +81,17 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
+}
+
+#preloader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  background-color: rgba(51, 51, 51, 0.5);;
+  color: #fff;
+  width: 100%;
+  visibility: hidden;
 }
 
 #background {

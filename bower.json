@@ -37,6 +37,7 @@
     "common-style": "https://github.com/Rise-Vision/common-style.git",
     "rv-angular-bootstrap-colorpicker": "https://github.com/Rise-Vision/angular-bootstrap-colorpicker.git#3.0.14",
     "rv-anythingslider": "https://github.com/Rise-Vision/AnythingSlider.git#1.9.5",
+    "spin.js": "~2.0.0",
     "ui-bootstrap": "~0.11.0",
     "underscore": "~1.8.2",
     "webcomponentsjs": "~0.5.2",
