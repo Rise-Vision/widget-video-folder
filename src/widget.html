@@ -20,8 +20,8 @@
 </head>
 <body>
 
-  <rise-storage id="backgroundStorage"></rise-storage>
-  <rise-storage id="videoFolderStorage"></rise-storage>
+  <rise-storage id="backgroundStorage" refresh="15"></rise-storage>
+  <rise-storage id="videoFolderStorage" refresh="15"></rise-storage>
 
   <div id="background"></div>
   <div id="container"></div>
@@ -48,6 +48,7 @@
   <!-- endbuild -->
 
   <!-- build:js js/widget.min.js -->
+  <script src="components/underscore/underscore-min.js"></script>
   <script src="config/config.js"></script>
   <script src="widget/video-folder.js"></script>
   <script src="components/widget-common/dist/background.js"></script>

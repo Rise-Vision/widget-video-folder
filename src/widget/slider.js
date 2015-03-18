@@ -1,3 +1,5 @@
+/* global _ */
+
 var RiseVision = RiseVision || {};
 RiseVision.VideoFolder = RiseVision.VideoFolder || {};
 
@@ -5,9 +7,11 @@ RiseVision.VideoFolder.Slider = function (data) {
   "use strict";
 
   var _storage = document.getElementById("videoFolderStorage"),
-    _currentUrls = null,
+    _currentFiles = null,
+    _newFiles = null,
     _initialBuild = true,
-    _$api = null;
+    _$api = null,
+    _refreshWaiting = false;
 
   /*
    *  Private Methods
@@ -34,7 +38,7 @@ RiseVision.VideoFolder.Slider = function (data) {
       items = [],
       item = null;
 
-    _currentUrls.forEach(function(url, index) {
+    _currentFiles.forEach(function(file, index) {
       var videoContainer = document.createElement("div"),
         video = document.createElement("video"),
         source = document.createElement("source");
@@ -53,8 +57,8 @@ RiseVision.VideoFolder.Slider = function (data) {
       video.volume = data.video.volume / 100;
 
       // set the "type" attribute on <source>
-      source.setAttribute("type", "video/" + _getVideoFileType(url));
-      source.setAttribute("src", url);
+      source.setAttribute("type", "video/" + _getVideoFileType(file.url));
+      source.setAttribute("src", file.url);
 
       video.appendChild(source);
       videoContainer.appendChild(video);
@@ -104,7 +108,7 @@ RiseVision.VideoFolder.Slider = function (data) {
     return value;
   }
 
-  function _configurePlugin(urls) {
+  function _configurePlugin(files) {
     var container = document.getElementById("container"),
       fragment = document.createDocumentFragment(),
       ul = document.createElement("ul");
@@ -113,7 +117,7 @@ RiseVision.VideoFolder.Slider = function (data) {
     fragment.appendChild(ul);
     container.appendChild(fragment);
 
-    _currentUrls = urls;
+    _currentFiles = files;
     _addVideos();
 
     $("#slider")
@@ -134,11 +138,17 @@ RiseVision.VideoFolder.Slider = function (data) {
     var storageSort = _getStorageSort(data.order);
 
     _storage.addEventListener("rise-storage-response", function(e) {
-      if (_initialBuild) {
-        _configurePlugin(e.detail);
-      } /*else {
-        // TODO: handle a refresh
-      }*/
+      if (e.detail && e.detail.files && e.detail.files.length > 0) {
+        if (_initialBuild) {
+          _configurePlugin(e.detail.files);
+        } else {
+          if (!_.isEqual(_currentFiles, e.detail.files)) {
+            _newFiles = e.detail.files;
+            _refreshWaiting = true;
+          }
+        }
+      }
+
     });
 
     _storage.setAttribute("companyId", data.storage.companyId);
