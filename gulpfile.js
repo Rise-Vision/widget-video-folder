@@ -87,6 +87,11 @@
       .pipe(gulp.dest("dist/img"));
   });
 
+  gulp.task("slider-images", function () {
+    gulp.src("src/components/rv-anythingslider/images/**/*")
+      .pipe(gulp.dest("dist/images"));
+  });
+
   gulp.task("i18n", function(cb) {
     return gulp.src(["src/components/rv-common-i18n/dist/locales/**/*"])
       .pipe(gulp.dest("dist/locales"));
@@ -140,7 +145,7 @@
   });
 
   gulp.task("build", function (cb) {
-    runSequence(["clean", "config"], ["source", "fonts", "images", "i18n", "rise-storage"], ["unminify"], cb);
+    runSequence(["clean", "config"], ["source", "fonts", "images", "slider-images", "i18n", "rise-storage"], ["unminify"], cb);
   });
 
   gulp.task("default", [], function() {
