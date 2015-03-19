@@ -24,17 +24,13 @@
   <rise-storage id="videoFolderStorage" refresh="15"></rise-storage>
 
   <div id="background"></div>
+  <div id="preloader"></div>
   <div id="container"></div>
 
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 
   <!-- build:js js/jquery.anythingslider.min.js -->
   <script src="components/rv-anythingslider/js/jquery.anythingslider.js"></script>
-  <!-- endbuild -->
-
-  <!-- AnythingSlider video extension; optional, but needed to control video pause/play -->
-  <!-- build:js js/jquery.anythingslider.video.min.js -->
-  <script src="components/rv-anythingslider/js/jquery.anythingslider.video.js"></script>
   <!-- endbuild -->
 
   <!-- build:e2eMockData -->
@@ -49,10 +45,12 @@
 
   <!-- build:js js/widget.min.js -->
   <script src="components/underscore/underscore-min.js"></script>
+  <script src="components/spin.js/spin.js"></script>
   <script src="config/config.js"></script>
   <script src="widget/video-folder.js"></script>
   <script src="components/widget-common/dist/background.js"></script>
   <script src="widget/slider.js"></script>
+  <script src="widget/preloader.js"></script>
   <script src="widget/main.js"></script>
   <script src="widget/analytics.js"></script>
   <!-- endbuild -->
