@@ -14,7 +14,6 @@
       },
       "order": "alpha-asc",
       "pause": 10,
-      "autoHide": false,
       "video": {
         "autoplay": true,
         "scaleToFit": true,

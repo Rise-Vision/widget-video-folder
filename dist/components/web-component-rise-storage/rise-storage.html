@@ -364,9 +364,6 @@
             this.$.tagging.go();
           }
         }
-        else {
-          console.error("No companyId provided.");
-        }
       },
 
       /**
@@ -467,9 +464,6 @@
 
           this.url = url;
         }
-        else {
-          console.error("No companyId provided.");
-        }
       },
 
       /**
@@ -479,7 +473,8 @@
         var self = this,
           file = {},
           files = [],
-          response = null;
+          response = null,
+          suffix = "?alt=media";
 
         if (resp && resp.response && resp.response.items) {
           resp.response.items.forEach(function(item) {
@@ -487,7 +482,7 @@
 
             // Check that this is not a folder.
             if (item.name && (item.name.slice(-1) !== "/")) {
-              if (item.mediaLink) {
+              if (item.selfLink) {
                 if (!self.filterFiles(item.contentType)) {
                   return;
                 }
@@ -502,9 +497,7 @@
                   }
                 }
 
-                if (item.mediaLink) {
-                  file.url = self.isCacheRunning ? self.riseCacheUrl + escape(item.mediaLink) : item.mediaLink;
-                }
+                file.url = self.isCacheRunning ? (self.riseCacheUrl + escape(item.selfLink) + suffix) : (item.selfLink + suffix);
 
                 files.push(file);
               }
@@ -512,8 +505,8 @@
           });
         }
         // A single file stored in the root of a bucket has a different response format.
-        else if (resp && resp.response && resp.response.mediaLink) {
-          file.url = self.isCacheRunning ? self.riseCacheUrl + escape(resp.response.mediaLink) : resp.response.mediaLink;
+        else if (resp && resp.response && resp.response.selfLink) {
+          file.url = self.isCacheRunning ? (self.riseCacheUrl + escape(resp.response.selfLink) + suffix) : (resp.response.selfLink + suffix);
 
           files.push(file);
         }

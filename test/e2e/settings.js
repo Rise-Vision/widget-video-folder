@@ -59,9 +59,6 @@
       // Pause should be 10
       expect(element(by.model("settings.additionalParams.pause")).getAttribute("value")).to.eventually.equal("10");
 
-      // Autohide should be false
-      expect(element(by.model("settings.additionalParams.autoHide")).isSelected()).to.eventually.be.false;
-
     });
 
     it("Should be invalid form and Save button disabled due to invalid URL", function () {
@@ -106,7 +103,6 @@
           },
           "order": "alpha-asc",
           "pause": 10,
-          "autoHide": false,
           "video": {
             "autoplay":true,
             "scaleToFit": true,
