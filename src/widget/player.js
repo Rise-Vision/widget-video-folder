@@ -2,6 +2,9 @@ var files;
 var volume, autoPlay, scaleToFit, pauseDuration;
 var width, height;
 
+var isLoading = true,
+  pauseHandlerOn = false;
+
 var viewerPaused = false;
 var pauseTimer = null;
 
@@ -90,11 +93,32 @@ function PlayerJW() {
   }
 
   function onPlay() {
-    clearTimeout(pauseTimer);
+    if (isLoading) {
+      isLoading = false;
+
+      jwplayer().pause();
+      jwplayer().setMute(false);
+      jwplayer().setVolume(volume);
+
+      readyEvent();
+
+    } else {
+      if (!pauseHandlerOn) {
+        pauseHandlerOn = true;
+
+        // now define pause handler
+        jwplayer().onPause(function () {
+          onPause();
+        });
+      }
+
+      clearTimeout(pauseTimer);
+    }
+
   }
 
   function onPause() {
-    if (!viewerPaused) {
+    if (!viewerPaused && !isLoading) {
       // user has paused, set a timer to play again
       clearTimeout(pauseTimer);
 
@@ -114,7 +138,8 @@ function PlayerJW() {
     if (error) {
       errorEvent({
         type: "video",
-        index: jwplayer().getPlaylistIndex()
+        index: jwplayer().getPlaylistIndex(),
+        message: error.message
       });
     }
   }
@@ -123,7 +148,8 @@ function PlayerJW() {
     if (error) {
       errorEvent({
         type: "setup",
-        index: 0
+        index: 0,
+        message: error.message
       });
     }
   }
@@ -153,15 +179,8 @@ function PlayerJW() {
 
       document.getElementById("player").className += " notransition";
 
-      jwplayer().setMute(false);
-      jwplayer().setVolume(volume);
-
       jwplayer().onPlaylistComplete(function () {
         onPlaylistComplete();
-      });
-
-      jwplayer().onPause(function () {
-        onPause();
       });
 
       jwplayer().onPlay(function () {
@@ -173,7 +192,8 @@ function PlayerJW() {
       });
 
       setTimeout(function () {
-        readyEvent();
+        // need to test if there is an error playing first video
+        jwplayer().play();
       }, 200);
 
     });
@@ -198,6 +218,8 @@ function PlayerJW() {
 
   this.remove = function() {
     viewerPaused = false;
+    clearTimeout(pauseTimer);
+    pauseTimer = null;
     jwplayer().remove();
   };
 

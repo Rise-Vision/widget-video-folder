@@ -12,9 +12,7 @@ RiseVision.VideoFolder = (function (gadgets) {
     _background = null,
     _storage = null;
 
-  var _initialized = false,
-    _ended = false,
-    _setupError = false;
+  var _initialized = false;
 
   var _currentFiles;
 
@@ -39,6 +37,24 @@ RiseVision.VideoFolder = (function (gadgets) {
     }
 
     return null;
+  }
+
+  function _clearContainer() {
+    var container = document.getElementById("videoContainer");
+
+    // remove the iframe by clearing all elements inside div container
+    while (container.firstChild) {
+      container.removeChild(container.firstChild);
+    }
+  }
+
+  function _clearFrame() {
+    var myFrameObj = _getFrameObject();
+
+    if (myFrameObj) {
+      myFrameObj.remove();
+      myFrameObj.location.reload();
+    }
   }
 
   function _addFrame() {
@@ -93,15 +109,11 @@ RiseVision.VideoFolder = (function (gadgets) {
   function play() {
     var frameObj = _getFrameObject();
 
-    if (!_setupError) {
-      if (frameObj) {
-        frameObj.play();
-      } else {
-        _addFrame();
-        _createPlayer();
-      }
+    if (frameObj) {
+      frameObj.play();
     } else {
-      _done();
+      _addFrame();
+      _createPlayer();
     }
 
   }
@@ -125,25 +137,14 @@ RiseVision.VideoFolder = (function (gadgets) {
   }
 
   function playerEnded() {
-    var container = document.getElementById("videoContainer"),
-      myFrameObj = _getFrameObject();
+    _clearFrame();
 
-    if (myFrameObj) {
-      myFrameObj.remove();
-      myFrameObj.location.reload();
+    setTimeout(function () {
 
-      setTimeout(function () {
-        _ended = true;
+      _clearContainer();
+      _done();
 
-        // remove the iframe by clearing all elements inside div container
-        while (container.firstChild) {
-          container.removeChild(container.firstChild);
-        }
-
-        _done();
-      }, 200);
-    }
-
+    }, 200);
   }
 
   function playerReady() {
@@ -158,11 +159,18 @@ RiseVision.VideoFolder = (function (gadgets) {
   function playerError(error) {
     console.debug("video-folder::playerError()", error);
 
-    if (error.type === "setup" || error.index === 0) {
-      _setupError = true;
+    if (!_initialized) {
+      // Widget has not sent "ready" yet and there is an error (setup or playback of first video, doesn't matter which)
+      _clearFrame();
+      _clearContainer();
+
+      // do nothing more, ensure "ready" is not sent to Viewer so that this widget can be skipped
+
+    } else {
+      // force widget to act as though the playlist is done
+      playerEnded();
     }
 
-    playerEnded();
   }
 
   function stop() {
