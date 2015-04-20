@@ -70,7 +70,9 @@ RiseVision.VideoFolder = (function (gadgets) {
 
     if (myFrameObj) {
       myFrameObj.remove();
-      myFrameObj.location.reload();
+
+      // destroy the contents of the iframe
+      document.querySelector("#videoContainer iframe").setAttribute("src", "about:blank");
     }
   }
 
@@ -92,13 +94,19 @@ RiseVision.VideoFolder = (function (gadgets) {
   }
 
   function _createPlayer() {
-    var html = RiseVision.VideoFolder.Template.getHTML(_additionalParams, _currentFiles),
-      myFrameObj = _getFrameObject();
+    var iframe = document.querySelector("#videoContainer iframe");
 
-    if (myFrameObj) {
-      myFrameObj.document.open();
-      myFrameObj.document.write(html);
-      myFrameObj.document.close();
+    if (iframe) {
+      iframe.onload = function () {
+        iframe.onload = null;
+
+        var frameObj = _getFrameObject();
+
+        // initialize and load the player inside the iframe
+        frameObj.init(_additionalParams, _currentFiles);
+      };
+
+      iframe.setAttribute("src", "player.html");
     }
   }
 
@@ -398,302 +406,6 @@ RiseVision.VideoFolder.Storage = function (data) {
     "init": init
   };
 };
-
-var files;
-var volume, autoPlay, scaleToFit, pauseDuration;
-var width, height;
-
-var isLoading = true,
-  pauseHandlerOn = false;
-
-var viewerPaused = false;
-var pauseTimer = null;
-
-var player = null;
-
-function doneEvent() {
-  parent.RiseVision.VideoFolder.playerEnded();
-}
-
-function readyEvent() {
-  parent.RiseVision.VideoFolder.playerReady();
-}
-
-function errorEvent(data) {
-  parent.RiseVision.VideoFolder.playerError(data);
-}
-
-function loadVideo(widthParam, heightParam, volumeParam, autoPlayParam, scaleToFitParam, pauseParam, filesParam) {
-  width = widthParam;
-  height = heightParam;
-  volume = volumeParam;
-  autoPlay = autoPlayParam;
-  scaleToFit = scaleToFitParam;
-  pauseDuration = pauseParam;
-  files = filesParam.split(",");
-
-  if (player) {
-    player.loadVideo();
-  }
-}
-
-function play() {
-  player.play();
-}
-
-function pause() {
-  player.pause();
-}
-
-function stop() {
-  player.stop();
-}
-
-function remove() {
-  player.remove();
-}
-
-function PlayerJW() {
-  function getVideoFileType(url) {
-    var extensions = [".mp4", ".webm", ".ogg", ".ogv"],
-      urlLowercase = url.toLowerCase(),
-      type = null,
-      i;
-
-    for (i = 0; i <= extensions.length; i += 1) {
-      if (urlLowercase.indexOf(extensions[i]) !== -1) {
-        type = extensions[i].substr(extensions[i].lastIndexOf(".") + 1);
-        break;
-      }
-    }
-
-    if (type === "ogv") {
-      type = "ogg";
-    }
-
-    return type;
-  }
-
-  function getPlaylist() {
-    var playlist = [];
-
-    for (var i = 0; i < files.length; i += 1) {
-      playlist.push({
-        sources: [{
-          file: files[i],
-          type: getVideoFileType(files[i])
-        }]
-      });
-    }
-
-    return playlist;
-  }
-
-  function onPlaylistComplete() {
-    doneEvent();
-  }
-
-  function onPlay() {
-    if (isLoading) {
-      isLoading = false;
-
-      jwplayer().pause();
-      jwplayer().setMute(false);
-      jwplayer().setVolume(volume);
-
-      readyEvent();
-
-    } else {
-      if (!pauseHandlerOn) {
-        pauseHandlerOn = true;
-
-        // now define pause handler
-        jwplayer().onPause(function () {
-          onPause();
-        });
-      }
-
-      clearTimeout(pauseTimer);
-    }
-
-  }
-
-  function onPause() {
-    if (!viewerPaused && !isLoading) {
-      // user has paused, set a timer to play again
-      clearTimeout(pauseTimer);
-
-      pauseTimer = setTimeout(function() {
-        // continue playing the current video
-        jwplayer().play();
-
-        // workaround for controls remaining visible, turn them off and on again
-        jwplayer().setControls(false);
-        jwplayer().setControls(true);
-
-      }, pauseDuration * 1000);
-    }
-  }
-
-  function onPlayerError(error) {
-    if (error) {
-      errorEvent({
-        type: "video",
-        index: jwplayer().getPlaylistIndex(),
-        message: error.message
-      });
-    }
-  }
-
-  function onSetupError(error) {
-    if (error) {
-      errorEvent({
-        type: "setup",
-        index: 0,
-        message: error.message
-      });
-    }
-  }
-
-  this.loadVideo = function() {
-    jwplayer("player").setup({
-      playlist: getPlaylist(),
-      width : width,
-      height : height,
-      controls: !autoPlay,
-      stretching : scaleToFit ? "uniform" : "none"
-    });
-
-    jwplayer().onSetupError(function (error) {
-      onSetupError(error);
-    });
-
-    jwplayer().onReady(function () {
-      var elements = document.getElementById("player").getElementsByTagName("*"),
-        total = elements.length,
-        i;
-
-      // Workaround for Chrome App Player <webview> not handling CSS3 transition
-      for (i = 0; i < total; i += 1) {
-        elements[i].className += " notransition";
-      }
-
-      document.getElementById("player").className += " notransition";
-
-      jwplayer().onPlaylistComplete(function () {
-        onPlaylistComplete();
-      });
-
-      jwplayer().onPlay(function () {
-        onPlay();
-      });
-
-      jwplayer().onError(function (error) {
-        onPlayerError(error);
-      });
-
-      setTimeout(function () {
-        // need to test if there is an error playing first video
-        jwplayer().play();
-      }, 200);
-
-    });
-  };
-
-  this.play = function() {
-    viewerPaused = false;
-    if (autoPlay) {
-      jwplayer().play();
-    }
-  };
-
-  this.pause = function() {
-    viewerPaused = true;
-    clearTimeout(pauseTimer);
-    jwplayer().pause();
-  };
-
-  this.stop = function() {
-    this.pause();
-  };
-
-  this.remove = function() {
-    viewerPaused = false;
-    clearTimeout(pauseTimer);
-    pauseTimer = null;
-    jwplayer().remove();
-  };
-
-}
-
-
-var RiseVision = RiseVision || {};
-RiseVision.VideoFolder = RiseVision.VideoFolder || {};
-
-RiseVision.VideoFolder.Template = (function () {
-  "use strict";
-
-  var TEMPLATE = "" +
-    "<html>" +
-    "<head>" +
-    "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">" +
-    "<title></title>" +
-    "<script type=\"text/javascript\" src=\"//s3.amazonaws.com/rise-common/scripts/jw-player/jwplayer.js\"></script>" +
-    "<script>jwplayer.key=\"xBXyUtAJ+brFzwc2kNhDg/Sqk8W7rmktAYliYHzVgxo=\"</script>" +
-    "<script type=\"text/javascript\" src=\"js/player.min.js\"></script>" +
-    "<style>" +
-    "	body { " +
-    "		background-color: transparent; " +
-    "		-moz-user-select: none; " +
-    "		-webkit-user-select: none; " +
-    "		-khtml-user-select: none; " +
-    "		user-select: none; " +
-    "	}" +
-    " .notransition { " +
-    "   -webkit-transition: none !important; " +
-    "   transition: none !important; " +
-    " }" +
-    "</style>" +
-    "</head>" +
-    "<body style=\"margin:0px;\">" +
-    "<div id=\"player\">Loading the player...</div>" +
-    "<script language=\"javascript\">" +
-    "	window.oncontextmenu = function() {" +
-    "		return false;" +
-    "	};" +
-    "	try {" +
-    "		player = new PlayerJW();" +
-    "		loadVideo(\"%s1\", \"%s2\", %s3, %s4, %s5, %s6, \"%s7\");" +
-    "	} catch (e) {" +
-    "		console.log(e.message);" +
-    "		parent.RiseVision.VideoFolder.playerError();" +
-    "	}" +
-    "</script>" +
-    "</body>" +
-    "</html>";
-
-  /*
-   *  Public Methods
-   */
-  function getHTML(params, files) {
-    var htmlString = TEMPLATE;
-
-    htmlString = htmlString.replace("%s1", params.width + "px");
-    htmlString = htmlString.replace("%s2", params.height + "px");
-    htmlString = htmlString.replace("%s3", params.video.volume);
-    htmlString = htmlString.replace("%s4", params.video.autoplay);
-    htmlString = htmlString.replace("%s5", params.video.scaleToFit);
-    htmlString = htmlString.replace("%s6", params.pause);
-    htmlString = htmlString.replace("%s7", files.join());
-
-    return htmlString;
-  }
-
-  return {
-    "getHTML": getHTML
-  };
-
-})();
 
 /* global gadgets, RiseVision */
 

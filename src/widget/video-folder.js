@@ -53,7 +53,9 @@ RiseVision.VideoFolder = (function (gadgets) {
 
     if (myFrameObj) {
       myFrameObj.remove();
-      myFrameObj.location.reload();
+
+      // destroy the contents of the iframe
+      document.querySelector("#videoContainer iframe").setAttribute("src", "about:blank");
     }
   }
 
@@ -75,13 +77,19 @@ RiseVision.VideoFolder = (function (gadgets) {
   }
 
   function _createPlayer() {
-    var html = RiseVision.VideoFolder.Template.getHTML(_additionalParams, _currentFiles),
-      myFrameObj = _getFrameObject();
+    var iframe = document.querySelector("#videoContainer iframe");
 
-    if (myFrameObj) {
-      myFrameObj.document.open();
-      myFrameObj.document.write(html);
-      myFrameObj.document.close();
+    if (iframe) {
+      iframe.onload = function () {
+        iframe.onload = null;
+
+        var frameObj = _getFrameObject();
+
+        // initialize and load the player inside the iframe
+        frameObj.init(_additionalParams, _currentFiles);
+      };
+
+      iframe.setAttribute("src", "player.html");
     }
   }
 

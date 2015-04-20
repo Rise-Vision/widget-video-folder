@@ -10,6 +10,23 @@ var pauseTimer = null;
 
 var player = null;
 
+function init(params, list) {
+  window.oncontextmenu = function() {
+    return false;
+  };
+
+  width = params.width;
+  height = params.height;
+  volume = params.video.volume;
+  autoPlay = params.video.autoplay;
+  scaleToFit = params.video.scaleToFit;
+  pauseDuration = params.pause;
+  files = list;
+
+  player = new PlayerJW();
+  player.loadVideo();
+}
+
 function doneEvent() {
   parent.RiseVision.VideoFolder.playerEnded();
 }
@@ -20,20 +37,6 @@ function readyEvent() {
 
 function errorEvent(data) {
   parent.RiseVision.VideoFolder.playerError(data);
-}
-
-function loadVideo(widthParam, heightParam, volumeParam, autoPlayParam, scaleToFitParam, pauseParam, filesParam) {
-  width = widthParam;
-  height = heightParam;
-  volume = volumeParam;
-  autoPlay = autoPlayParam;
-  scaleToFit = scaleToFitParam;
-  pauseDuration = pauseParam;
-  files = filesParam.split(",");
-
-  if (player) {
-    player.loadVideo();
-  }
 }
 
 function play() {

@@ -58,7 +58,7 @@
   });
 
   gulp.task("source", ["lint"], function () {
-    return gulp.src(['./src/settings.html', './src/widget.html'])
+    return gulp.src(['./src/settings.html', './src/widget.html', './src/widget/html/player.html'])
       .pipe(usemin({
         css: [minifyCSS()],
         js: [sourcemaps.init(), uglify(), sourcemaps.write()]
@@ -67,7 +67,7 @@
   });
 
   gulp.task("unminify", function () {
-    return gulp.src(['./src/settings.html', './src/widget.html'])
+    return gulp.src(['./src/settings.html', './src/widget.html', './src/widget/html/player.html'])
       .pipe(usemin({
         css: [rename(function (path) {
           path.basename = path.basename.substring(0, path.basename.indexOf(".min"))
@@ -102,14 +102,6 @@
       "src/components/underscore/*.js"
     ], {base: "./src/"})
       .pipe(gulp.dest("dist/"));
-  });
-
-  gulp.task("iframe-player", function () {
-    gulp.src(["src/widget/player.js"])
-      .pipe(gulp.dest("dist/js"))
-      .pipe(uglify())
-      .pipe(rename("player.min.js"))
-      .pipe(gulp.dest("dist/js"));
   });
 
   gulp.task("webdriver_update", factory.webdriveUpdate());
@@ -149,7 +141,7 @@
   });
 
   gulp.task("build", function (cb) {
-    runSequence(["clean", "config"], ["source", "fonts", "images", "i18n", "rise-storage", "iframe-player"], ["unminify"], cb);
+    runSequence(["clean", "config"], ["source", "fonts", "images", "i18n", "rise-storage"], ["unminify"], cb);
   });
 
   gulp.task("default", [], function() {
