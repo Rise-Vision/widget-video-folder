@@ -163,7 +163,8 @@ function PlayerJW() {
       width : width,
       height : height,
       controls: !autoPlay,
-      stretching : scaleToFit ? "uniform" : "none"
+      stretching : scaleToFit ? "uniform" : "none",
+      skin: "six"
     });
 
     jwplayer().onSetupError(function (error) {

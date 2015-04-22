@@ -20,7 +20,10 @@
   <rise-storage id="videoFolderStorage" refresh="15"></rise-storage>
 
   <div id="background"></div>
-  <div id="videoContainer"></div>
+  <div id="videoContainer">
+    <div id="if_0" class="frameContainer"></div>
+    <div id="if_1" class="frameContainer"></div>
+  </div>
 
   <!-- build:e2eMockData -->
   <!-- endbuild -->
@@ -37,6 +40,7 @@
   <script src="widget/video-folder.js"></script>
   <script src="components/widget-common/dist/background.js"></script>
   <script src="widget/storage.js"></script>
+  <script src="widget/frame-controller.js"></script>
   <script src="widget/main.js"></script>
   <script src="widget/analytics.js"></script>
   <!-- endbuild -->

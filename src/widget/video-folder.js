@@ -10,11 +10,14 @@ RiseVision.VideoFolder = (function (gadgets) {
 
   var _prefs = null,
     _background = null,
-    _storage = null;
+    _storage = null,
+    _frameController = null;
 
   var _initialized = false;
 
-  var _currentFiles;
+  var _currentFiles, _currentFrame;
+
+  var _frameCount = 0;
 
   /*
    *  Private Methods
@@ -28,69 +31,9 @@ RiseVision.VideoFolder = (function (gadgets) {
       true, true, true, true, true);
   }
 
-  function _getFrameObject() {
-    var iframe = document.querySelector("#videoContainer iframe");
-
-    if (iframe) {
-      return (iframe.contentWindow) ? iframe.contentWindow :
-        (iframe.contentDocument.document) ? iframe.contentDocument.document : iframe.contentDocument;
-    }
-
-    return null;
-  }
-
-  function _clearContainer() {
-    var container = document.getElementById("videoContainer");
-
-    // remove the iframe by clearing all elements inside div container
-    while (container.firstChild) {
-      container.removeChild(container.firstChild);
-    }
-  }
-
-  function _clearFrame() {
-    var myFrameObj = _getFrameObject();
-
-    if (myFrameObj) {
-      myFrameObj.remove();
-
-      // destroy the contents of the iframe
-      document.querySelector("#videoContainer iframe").setAttribute("src", "about:blank");
-    }
-  }
-
-  function _addFrame() {
-    var container = document.getElementById("videoContainer"),
-      iframe;
-
-    iframe = document.createElement("iframe");
-    iframe.setAttribute("allowTransparency", true);
-    iframe.setAttribute("frameborder", "0");
-    iframe.setAttribute("scrolling", "no");
-
-    container.appendChild(iframe);
-  }
-
   function _backgroundReady() {
     _storage = new RiseVision.VideoFolder.Storage(_additionalParams);
     _storage.init();
-  }
-
-  function _createPlayer() {
-    var iframe = document.querySelector("#videoContainer iframe");
-
-    if (iframe) {
-      iframe.onload = function () {
-        iframe.onload = null;
-
-        var frameObj = _getFrameObject();
-
-        // initialize and load the player inside the iframe
-        frameObj.init(_additionalParams, _currentFiles);
-      };
-
-      iframe.setAttribute("src", "player.html");
-    }
   }
 
   /*
@@ -98,8 +41,14 @@ RiseVision.VideoFolder = (function (gadgets) {
    */
   function onStorageInit(urls) {
     _currentFiles = urls;
-    _addFrame();
-    _createPlayer();
+
+    _frameController = new RiseVision.VideoFolder.FrameController();
+
+    // add the first frame and create its player
+    _frameController.add(0);
+    _currentFrame = 0;
+    _frameCount = 1;
+    _frameController.createFramePlayer(0, _additionalParams, _currentFiles);
   }
 
   function onStorageRefresh(/*urls*/) {
@@ -107,7 +56,7 @@ RiseVision.VideoFolder = (function (gadgets) {
   }
 
   function pause() {
-    var frameObj = _getFrameObject();
+    var frameObj = _frameController.getFrameObject(_currentFrame);
 
     if (frameObj) {
       frameObj.pause();
@@ -115,13 +64,22 @@ RiseVision.VideoFolder = (function (gadgets) {
   }
 
   function play() {
-    var frameObj = _getFrameObject();
+    var frameObj = _frameController.getFrameObject(_currentFrame);
 
     if (frameObj) {
       frameObj.play();
     } else {
-      _addFrame();
-      _createPlayer();
+      // set current frame to be the one visible
+      _currentFrame = (_currentFrame === 0) ? 1 : 0;
+
+      // play the current frame video
+      frameObj = _frameController.getFrameObject(_currentFrame);
+      frameObj.play();
+
+      // re-add previously removed frame and create the player, but hide visibility
+      _frameController.add(((_currentFrame === 0) ? 1 : 0));
+      _frameController.hide(((_currentFrame === 0) ? 1 : 0));
+      _frameController.createFramePlayer(((_currentFrame === 0) ? 1 : 0), _additionalParams, _currentFiles);
     }
 
   }
@@ -145,22 +103,25 @@ RiseVision.VideoFolder = (function (gadgets) {
   }
 
   function playerEnded() {
-    _clearFrame();
-
-    setTimeout(function () {
-
-      _clearContainer();
+    _frameController.show((_currentFrame === 0) ? 1 : 0);
+    _frameController.remove(_currentFrame, function () {
       _done();
-
-    }, 200);
+    });
   }
 
   function playerReady() {
     if (!_initialized) {
-      _initialized = true;
-      _ready();
-    } else {
-      play();
+      if (_frameCount === 2) {
+        // both frames have been created and loaded, can notify Viewer widget is ready
+        _initialized = true;
+        _ready();
+      } else {
+        // first frame player was successful and ready, create the second one but hide it
+        _frameController.add(1);
+        _frameController.hide(1);
+        _frameCount = 2;
+        _frameController.createFramePlayer(1, _additionalParams, _currentFiles);
+      }
     }
   }
 
@@ -169,8 +130,7 @@ RiseVision.VideoFolder = (function (gadgets) {
 
     if (!_initialized) {
       // Widget has not sent "ready" yet and there is an error (setup or playback of first video, doesn't matter which)
-      _clearFrame();
-      _clearContainer();
+      _frameController.remove(_currentFrame);
 
       // do nothing more, ensure "ready" is not sent to Viewer so that this widget can be skipped
 
