@@ -28952,7 +28952,7 @@ if (typeof config === "undefined") {
       .constant("LOCALES_SUFIX", ".json");
 
     angular.module("risevision.widget.common.storage-selector.config")
-      .value("STORAGE_MODAL", "http://storage-stage-rva-test.risevision.com/modal.html");
+      .value("STORAGE_MODAL", "http://storage-stage-rva-test.risevision.com/modal.html#/files/");
   }
 }
 

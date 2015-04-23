@@ -56,6 +56,15 @@ function remove() {
   player.remove();
 }
 
+function getPlaybackData() {
+  return {
+    total: files.length,
+    index: player.getCurrentIndex(),
+    duration: player.getDuration(),
+    position: player.getPosition()
+  }
+}
+
 function PlayerJW() {
   function getVideoFileType(url) {
     var extensions = [".mp4", ".webm", ".ogg", ".ogv"],
@@ -227,6 +236,18 @@ function PlayerJW() {
     pauseTimer = null;
     jwplayer().remove();
   };
+
+  this.getCurrentIndex = function() {
+    return jwplayer().getPlaylistIndex();
+  };
+
+  this.getDuration = function () {
+    return jwplayer().getDuration();
+  };
+
+  this.getPosition = function () {
+    return jwplayer().getPosition();
+  }
 
 }
 
