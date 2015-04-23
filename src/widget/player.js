@@ -1,6 +1,6 @@
 var files;
 var volume, autoPlay, scaleToFit, pauseDuration;
-var width, height;
+var width, height, skin;
 
 var isLoading = true,
   pauseHandlerOn = false;
@@ -10,13 +10,14 @@ var pauseTimer = null;
 
 var player = null;
 
-function init(params, list) {
+function init(params, list, skinVal) {
   window.oncontextmenu = function() {
     return false;
   };
 
   width = params.width;
   height = params.height;
+  skin = skinVal;
   volume = params.video.volume;
   autoPlay = params.video.autoplay;
   scaleToFit = params.video.scaleToFit;
@@ -163,7 +164,8 @@ function PlayerJW() {
       width : width,
       height : height,
       controls: !autoPlay,
-      stretching : scaleToFit ? "uniform" : "none"
+      stretching : scaleToFit ? "uniform" : "none",
+      skin: skin
     });
 
     jwplayer().onSetupError(function (error) {

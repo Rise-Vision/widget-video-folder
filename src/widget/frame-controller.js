@@ -1,3 +1,5 @@
+/* global config */
+
 var RiseVision = RiseVision || {};
 RiseVision.VideoFolder = RiseVision.VideoFolder || {};
 
@@ -57,7 +59,7 @@ RiseVision.VideoFolder.FrameController = function () {
           (iframe.contentDocument.document) ? iframe.contentDocument.document : iframe.contentDocument;
 
         // initialize and load the player inside the iframe
-        frameObj.init(params, files);
+        frameObj.init(params, files, config.SKIN);
       };
 
       iframe.setAttribute("src", "player.html");

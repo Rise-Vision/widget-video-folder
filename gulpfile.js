@@ -58,7 +58,7 @@
   });
 
   gulp.task("source", ["lint"], function () {
-    return gulp.src(['./src/settings.html', './src/widget.html', './src/widget/html/player.html'])
+    return gulp.src(['./src/settings.html', './src/widget.html', './src/player.html'])
       .pipe(usemin({
         css: [minifyCSS()],
         js: [sourcemaps.init(), uglify(), sourcemaps.write()]
@@ -67,7 +67,7 @@
   });
 
   gulp.task("unminify", function () {
-    return gulp.src(['./src/settings.html', './src/widget.html', './src/widget/html/player.html'])
+    return gulp.src(['./src/settings.html', './src/widget.html', './src/player.html'])
       .pipe(usemin({
         css: [rename(function (path) {
           path.basename = path.basename.substring(0, path.basename.indexOf(".min"))
@@ -86,6 +86,11 @@
   gulp.task("images", function() {
     gulp.src("src/components/rv-bootstrap-formhelpers/img/bootstrap-formhelpers-googlefonts.png")
       .pipe(gulp.dest("dist/img"));
+  });
+
+  gulp.task("skin", function() {
+    gulp.src("src/widget/skin/six.xml")
+      .pipe(gulp.dest("dist/skin"));
   });
 
   gulp.task("i18n", function(cb) {
@@ -141,7 +146,7 @@
   });
 
   gulp.task("build", function (cb) {
-    runSequence(["clean", "config"], ["source", "fonts", "images", "i18n", "rise-storage"], ["unminify"], cb);
+    runSequence(["clean", "config"], ["source", "fonts", "images", "i18n", "rise-storage", "skin"], ["unminify"], cb);
   });
 
   gulp.task("default", [], function() {
