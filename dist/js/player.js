@@ -1,5 +1,5 @@
 var files;
-var volume, autoPlay, scaleToFit, pauseDuration;
+var controls, volume, autoPlay, scaleToFit, pauseDuration;
 var width, height, skin;
 
 var isLoading = true,
@@ -18,10 +18,16 @@ function init(params, list, skinVal) {
   width = params.width;
   height = params.height;
   skin = skinVal;
+  controls = params.video.controls;
   volume = params.video.volume;
   autoPlay = params.video.autoplay;
   scaleToFit = params.video.scaleToFit;
-  pauseDuration = params.pause;
+
+  // convert pause value to number if type is "string"
+  params.video.pause = (typeof params.video.pause === "string") ? parseInt(params.video.pause, 10) : params.video.pause;
+  // if not of type "number", set its value to 0 so a pause does not get applied
+  pauseDuration = (typeof params.video.pause === "number") ? params.video.pause : 0;
+
   files = list;
 
   player = new PlayerJW();
@@ -113,10 +119,14 @@ function PlayerJW() {
       jwplayer().setMute(false);
       jwplayer().setVolume(volume);
 
+      if (controls && !autoPlay) {
+        jwplayer().setControls(true);
+      }
+
       readyEvent();
 
     } else {
-      if (!pauseHandlerOn) {
+      if (controls && pauseDuration > 1 && !pauseHandlerOn) {
         pauseHandlerOn = true;
 
         // now define pause handler
@@ -172,7 +182,7 @@ function PlayerJW() {
       playlist: getPlaylist(),
       width : width,
       height : height,
-      controls: !autoPlay,
+      controls: false,
       stretching : scaleToFit ? "uniform" : "none",
       skin: skin
     });
@@ -215,9 +225,23 @@ function PlayerJW() {
 
   this.play = function() {
     viewerPaused = false;
+
     if (autoPlay) {
+      if (controls && !jwplayer().getControls()) {
+        // Will be first time player is being told to play so doing this here and not in setup so that controls
+        // aren't visible upon playing for the first time.
+        jwplayer().setControls(true);
+      }
+
       jwplayer().play();
+
+      if (controls) {
+        // workaround for controls remaining visible, turn them off and on again
+        jwplayer().setControls(false);
+        jwplayer().setControls(true);
+      }
     }
+
   };
 
   this.pause = function() {

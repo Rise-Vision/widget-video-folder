@@ -44,7 +44,8 @@
         </div>
         <form role="form" name="settingsForm">
           <!-- URL -->
-          <url-field name="videoFolderUrl" url="settings.additionalParams.url"
+          <label>{{"widgets.storage.folder.url" | translate}}</label>
+          <url-field name="videoFolderUrl" url="settings.additionalParams.url" hide-label="true"
                      company-id="{{settings.params.companyId}}"
                      ng-model="urlentry" valid></url-field>
           <p id="folder-error" class="text-danger text-validation" ng-show="!isFolder">
@@ -54,21 +55,48 @@
           <div class="form-group">
             <order order="settings.additionalParams.order"></order>
           </div>
-          <!-- Pause -->
-          <div class="form-group">
-            <label>{{"widgets.pause.label" | translate}}</label>
-            <span popover="{{'widgets.pause.tooltip' | translate}}" popover-trigger="click" popover-placement="right" rv-tooltip></span>
-            <div class="row">
-              <div class="col-xs-6 col-md-3">
-                <div class="input-group">
-                  <input type="text" class="form-control" ng-model="settings.additionalParams.pause">
-                  <span class="input-group-addon">{{"common.units.seconds" | translate}}</span>
+          <!-- Video -->
+          <div class="section">
+            <h5>{{"video.heading" | translate}}</h5>
+            <!-- Scale To Fit -->
+            <div class="checkbox">
+              <label>
+                <input name="video-scale" type="checkbox" ng-model="settings.additionalParams.video.scaleToFit"> {{"widgets.scale-to-fit" | translate}}
+              </label>
+            </div>
+            <!-- Volume -->
+            <label>{{"video.volume.label" | translate}}</label>
+            <div>
+              <slider orientation="horizontal" handle="round" ng-model="settings.additionalParams.video.volume" min="0" step="1" max="100"></slider>
+            </div>
+            <!-- Use Controls -->
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" ng-model="settings.additionalParams.video.controls"> {{"widget-video-folder.controls" | translate}}
+              </label>
+            </div>
+            <div class="form-group" ng-show="settings.additionalParams.video.controls">
+              <!-- Autoplay -->
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" ng-model="settings.additionalParams.video.autoplay"> {{"video.autoplay.label" | translate}}
+                </label>
+              </div>
+              <!-- Resume After Pause -->
+              <div>
+                <label>{{"widget-video-folder.pause.label" | translate}}</label>
+                <span popover="{{'widget-video-folder.pause.tooltip' | translate}}" popover-trigger="click" popover-placement="right" rv-tooltip></span>
+                <div class="row">
+                  <div class="col-xs-6 col-md-3">
+                    <div class="input-group">
+                      <input type="text" class="form-control" ng-model="settings.additionalParams.video.pause">
+                      <span class="input-group-addon">{{"common.units.seconds" | translate}}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-          <!-- Video Setting -->
-          <video-setting video="settings.additionalParams.video"></video-setting>
           <!-- Background Image Setting -->
           <div class="section">
             <h5>{{"background.heading" | translate}}</h5>
@@ -102,7 +130,6 @@
 <script src="components/widget-settings-ui-components/dist/js/angular/url-field.js"></script>
 <script src="components/widget-settings-ui-components/dist/js/angular/position-setting.js"></script>
 <script src="components/widget-settings-ui-components/dist/js/angular/background-image-setting.js"></script>
-<script src="components/widget-settings-ui-components/dist/js/angular/video-setting.js"></script>
 <script src="components/widget-settings-ui-components/dist/js/angular/order.js"></script>
 
 <script src="config/config.js"></script>

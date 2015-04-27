@@ -35,9 +35,6 @@
       // Order
       expect(element(by.model("order")).isPresent()).to.eventually.be.true;
 
-      // Video Setting
-      expect(element(by.model("video.autoplay")).isPresent()).to.eventually.be.true;
-
       // Background Image Setting
       expect(element(by.model("background.color")).isPresent()).to.eventually.be.true;
 
@@ -56,8 +53,17 @@
       // Order should be A - Z
       expect(element(by.model("order")).getAttribute("value")).to.eventually.equal("alpha-asc");
 
+      // Scale To Fit should be true
+      expect(element(by.model("settings.additionalParams.video.scaleToFit")).isSelected()).to.eventually.be.true;
+
+      // Show Video Controls should be false
+      expect(element(by.model("settings.additionalParams.video.controls")).isSelected()).to.eventually.be.true;
+
+      // Autoplay should be true
+      expect(element(by.model("settings.additionalParams.video.autoplay")).isSelected()).to.eventually.be.true;
+
       // Pause should be 10
-      expect(element(by.model("settings.additionalParams.pause")).getAttribute("value")).to.eventually.equal("10");
+      expect(element(by.model("settings.additionalParams.video.pause")).getAttribute("value")).to.eventually.equal("10");
 
     });
 
@@ -102,11 +108,12 @@
             "fileName": ""
           },
           "order": "alpha-asc",
-          "pause": 10,
           "video": {
-            "autoplay":true,
             "scaleToFit": true,
-            "volume":50
+            "volume":50,
+            "controls": true,
+            "autoplay":true,
+            "pause": 10
           },
           "background": {
             "color": "rgba(255,255,255,0)",

@@ -74,7 +74,7 @@ RiseVision.VideoFolder = (function (gadgets) {
     if (currentFrameObj) {
       // Only if there are no video controls.
       // User interacting with controls, particularly seeking and skipping videos, would cause issues
-      if (_additionalParams.video.autoplay) {
+      if (!_additionalParams.video.controls) {
         currentFrameData = currentFrameObj.getPlaybackData();
 
         if (currentFrameData.total === (currentFrameData.index + 1)) {
