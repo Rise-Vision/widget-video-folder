@@ -42,6 +42,7 @@
           <label>{{"widgets.storage.folder.url" | translate}}</label>
           <url-field name="videoFolderUrl" url="settings.additionalParams.url" hide-label="true"
                      company-id="{{settings.params.companyId}}"
+                     storage-type="single-folder"
                      ng-model="urlentry" valid></url-field>
           <p id="folder-error" class="text-danger text-validation" ng-show="!isFolder">
             {{"widgets.errors.storage-folder" | translate}}
