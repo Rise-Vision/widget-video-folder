@@ -28407,7 +28407,7 @@ angular.module("risevision.widget.common.storage-selector")
     $scope.storageUrl = storageUrl;
 
     $window.addEventListener("message", function (event) {
-      var storageTest = "storage-stage.risevision.com",
+      var storageTest = "storage-stage-rva-test.risevision.com",
         storageProd = "storage.risevision.com";
 
       if (event.origin.indexOf(storageTest) === -1 && event.origin.indexOf(storageProd) === -1) {
@@ -28816,80 +28816,6 @@ app.run(["$templateCache", function($templateCache) {
 (function () {
   "use strict";
 
-  angular.module("risevision.widget.common.video-setting", [
-    "risevision.common.i18n",
-    "ui.bootstrap-slider"
-  ])
-    .directive("videoSetting", ["$templateCache", "$log", function ($templateCache/*, $log*/) {
-      return {
-        restrict: "E",
-        scope: {
-          video: "="
-        },
-        template: $templateCache.get("_angular/video-setting/video-setting.html"),
-        link: function ($scope) {
-          $scope.defaultSetting = {
-            autoplay: true,
-            scaleToFit: true,
-            volume: 50
-          };
-
-          $scope.defaults = function(obj) {
-            if (obj) {
-              for (var i = 1, length = arguments.length; i < length; i++) {
-                var source = arguments[i];
-
-                for (var prop in source) {
-                  if (obj[prop] === void 0) {
-                    obj[prop] = source[prop];
-                  }
-                }
-              }
-            }
-            return obj;
-          };
-
-          $scope.$watch("video", function(video) {
-            $scope.defaults(video, $scope.defaultSetting);
-          });
-
-        }
-      };
-    }]);
-}());
-
-(function(module) {
-try { app = angular.module("risevision.widget.common.video-setting"); }
-catch(err) { app = angular.module("risevision.widget.common.video-setting", []); }
-app.run(["$templateCache", function($templateCache) {
-  "use strict";
-  $templateCache.put("_angular/video-setting/video-setting.html",
-    "<div class=\"section\">\n" +
-    "  <h5>{{\"video.heading\" | translate}}</h5>\n" +
-    "  <div class=\"form-group\">\n" +
-    "    <div class=\"checkbox\">\n" +
-    "      <label>\n" +
-    "        <input name=\"video-autoplay\" type=\"checkbox\" ng-model=\"video.autoplay\"> {{\"video.autoplay.label\" | translate}}\n" +
-    "      </label>\n" +
-    "    </div>\n" +
-    "  </div>\n" +
-    "  <div class=\"checkbox\">\n" +
-    "    <label>\n" +
-    "      <input name=\"video-scale\" type=\"checkbox\" ng-model=\"video.scaleToFit\"> {{\"widgets.scale-to-fit\" | translate}}\n" +
-    "    </label>\n" +
-    "  </div>\n" +
-    "  <label>{{\"video.volume.label\" | translate}}</label>\n" +
-    "  <div>\n" +
-    "    <slider orientation=\"horizontal\" handle=\"round\" ng-model=\"video.volume\" min=\"0\" step=\"1\" max=\"100\"></slider>\n" +
-    "  </div>\n" +
-    "</div>\n" +
-    "");
-}]);
-})();
-
-(function () {
-  "use strict";
-
   angular.module("risevision.widget.common.order", ["risevision.common.i18n"])
     .directive("order", ["$templateCache", "$log", function ($templateCache/*, $log*/) {
       return {
@@ -28936,7 +28862,14 @@ app.run(["$templateCache", function($templateCache) {
 /* exported config */
 if (typeof config === "undefined") {
   var config = {
-    // variables go here
+    /*
+     NOTE: Relative path to skin file does not work when viewing/testing locally using Preview app
+
+     When needing to work on skin file "six.xml", upload file to server and change SKIN value to point to server location
+     CORS will be required. Handy CORS Chrome extension can be found here
+     https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi?hl=en
+     */
+    SKIN: ""
   };
 
   if (typeof angular !== "undefined") {
@@ -28945,7 +28878,7 @@ if (typeof config === "undefined") {
       .constant("LOCALES_SUFIX", ".json");
 
     angular.module("risevision.widget.common.storage-selector.config")
-      .value("STORAGE_MODAL", "https://storage-stage.risevision.com/rva-test/dist/storage-modal.html#/files/");
+      .value("STORAGE_MODAL", "http://storage-stage-rva-test.risevision.com/modal.html#/files/");
   }
 }
 
@@ -28954,7 +28887,7 @@ angular.module("risevision.widget.video-folder.settings", [
   "risevision.widget.common",
   "risevision.widget.common.widget-button-toolbar",
   "risevision.widget.common.background-image-setting",
-  "risevision.widget.common.video-setting",
+  "ui.bootstrap-slider",
   "risevision.widget.common.order"
 ]);
 
@@ -29400,9 +29333,13 @@ angular.module("risevision.widget.video-folder.settings")
       url: "",
       storage: {},
       order: "alpha-asc",
-      pause: 10,
-      autoHide: false,
-      video: {},
+      video: {
+        scaleToFit: true,
+        volume: 50,
+        controls: true,
+        autoplay: true,
+        pause: 10
+      },
       background: {},
       backgroundStorage: {}
     }

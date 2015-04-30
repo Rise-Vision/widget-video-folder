@@ -8,10 +8,6 @@
   <script src="components/webcomponentsjs/webcomponents.min.js"></script>
   <link rel="import" href="components/web-component-rise-storage/rise-storage.html">
 
-  <!-- build:css css/anythingslider.min.css -->
-  <link rel="stylesheet" type="text/css" href="components/rv-anythingslider/css/anythingslider.css">
-  <!-- endbuild -->
-
   <!-- build:css css/video-folder.min.css -->
   <link rel="stylesheet" type="text/css" href="widget/css/video-folder.css">
   <link rel="stylesheet" type="text/css" href="components/widget-common/dist/css/background.css">
@@ -24,14 +20,10 @@
   <rise-storage id="videoFolderStorage" refresh="15"></rise-storage>
 
   <div id="background"></div>
-  <div id="preloader"></div>
-  <div id="container"></div>
-
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-
-  <!-- build:js js/jquery.anythingslider.min.js -->
-  <script src="components/rv-anythingslider/js/jquery.anythingslider.js"></script>
-  <!-- endbuild -->
+  <div id="videoContainer">
+    <div id="if_0" class="frameContainer"></div>
+    <div id="if_1" class="frameContainer"></div>
+  </div>
 
   <!-- build:e2eMockData -->
   <!-- endbuild -->
@@ -44,15 +36,16 @@
   <!-- endbuild -->
 
   <!-- build:js js/widget.min.js -->
-  <script src="components/underscore/underscore-min.js"></script>
-  <script src="components/spin.js/spin.js"></script>
   <script src="config/config.js"></script>
   <script src="widget/video-folder.js"></script>
   <script src="components/widget-common/dist/background.js"></script>
-  <script src="widget/slider.js"></script>
-  <script src="widget/preloader.js"></script>
+  <script src="widget/storage.js"></script>
+  <script src="widget/frame-controller.js"></script>
   <script src="widget/main.js"></script>
   <script src="widget/analytics.js"></script>
+  <!-- endbuild -->
+
+  <!-- build:e2ePolymerReadyMock -->
   <!-- endbuild -->
 </body>
 </html>

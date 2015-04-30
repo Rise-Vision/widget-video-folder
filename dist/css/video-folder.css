@@ -35,20 +35,6 @@ video {
 }
 
 /* =========================================================================
-Anything Slider Overrides
-========================================================================== */
-
-.anythingSlider-default {
-  margin: 0 auto;
-  /*45px right & left padding for the arrows, 28px @ bottom for navigation*/
-  padding: 9px 45px;
-}
-
-.anythingSlider .anythingWindow {
-  border: none;
-}
-
-/* =========================================================================
 Custom Styling
 ========================================================================== */
 
@@ -59,39 +45,33 @@ body {
   padding: 0;
 }
 
-#container {
-  width: 100%;
-  /* height is necessary and is set dynamically based on placeholder height */
-  list-style: none;
-  /* Prevent FOUC (see FAQ page) and keep things readable if javascript is disabled */
-  overflow-y: auto;
-  overflow-x: hidden;
-  visibility: hidden;
+#videoContainer {
+  /* Positioning */
+  position: relative;
 }
 
-.video-container {
-  position: relative;
-  overflow: hidden;
-  max-width: 100%;
-  height: auto;
-}
-.video-container video {
+.frameContainer {
+  /* Positioning */
   position: absolute;
   top: 0;
   left: 0;
+  z-index: 0;
+
+  /* Display & Box Model */
   width: 100%;
   height: 100%;
 }
 
-#preloader {
+.frameContainer iframe {
+  /* Positioning */
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 9999;
-  background-color: rgba(51, 51, 51, 0.5);;
-  color: #fff;
+  z-index: 1;
+
+  /* Display & Box Model */
   width: 100%;
-  visibility: hidden;
+  height: 100%;
 }
 
 #background {

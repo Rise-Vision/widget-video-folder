@@ -2,7 +2,7 @@
 /* exported config */
 if (typeof config === "undefined") {
   var config = {
-    // variables go here
+    SKIN: "skin/six.xml"
   };
 
   if (typeof angular !== "undefined") {

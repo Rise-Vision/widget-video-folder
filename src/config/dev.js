@@ -2,7 +2,14 @@
 /* exported config */
 if (typeof config === "undefined") {
   var config = {
-    // variables go here
+    /*
+     NOTE: Relative path to skin file does not work when viewing/testing locally using Preview app
+
+     When needing to work on skin file "six.xml", upload file to server and change SKIN value to point to server location
+     CORS will be required. Handy CORS Chrome extension can be found here
+     https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi?hl=en
+     */
+    SKIN: ""
   };
 
   if (typeof angular !== "undefined") {
@@ -11,6 +18,6 @@ if (typeof config === "undefined") {
       .constant("LOCALES_SUFIX", ".json");
 
     angular.module("risevision.widget.common.storage-selector.config")
-      .value("STORAGE_MODAL", "https://storage-stage.risevision.com/rva-test/dist/storage-modal.html#/files/");
+      .value("STORAGE_MODAL", "http://storage-stage-rva-test.risevision.com/modal.html#/files/");
   }
 }

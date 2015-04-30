@@ -56,9 +56,13 @@ angular.module("risevision.widget.video-folder.settings")
       url: "",
       storage: {},
       order: "alpha-asc",
-      pause: 10,
-      autoHide: false,
-      video: {},
+      video: {
+        scaleToFit: true,
+        volume: 50,
+        controls: true,
+        autoplay: true,
+        pause: 10
+      },
       background: {},
       backgroundStorage: {}
     }
