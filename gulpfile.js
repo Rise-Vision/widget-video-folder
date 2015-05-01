@@ -89,7 +89,7 @@
   });
 
   gulp.task("skin", function() {
-    gulp.src("src/widget/skin/six.xml")
+    gulp.src("src/widget/skin/RVSkin.xml")
       .pipe(gulp.dest("dist/skin"));
   });
 
