@@ -10,16 +10,13 @@
 
   <!-- build:css css/video-folder.min.css -->
   <link rel="stylesheet" type="text/css" href="widget/css/video-folder.css">
-  <link rel="stylesheet" type="text/css" href="components/widget-common/dist/css/background.css">
   <!-- endbuild -->
 
 </head>
 <body>
 
-  <rise-storage id="backgroundStorage" refresh="15"></rise-storage>
   <rise-storage id="videoFolderStorage" refresh="15"></rise-storage>
 
-  <div id="background"></div>
   <div id="videoContainer">
     <div id="if_0" class="frameContainer"></div>
     <div id="if_1" class="frameContainer"></div>
@@ -38,7 +35,6 @@
   <!-- build:js js/widget.min.js -->
   <script src="config/config.js"></script>
   <script src="widget/video-folder.js"></script>
-  <script src="components/widget-common/dist/background.js"></script>
   <script src="widget/storage.js"></script>
   <script src="widget/frame-controller.js"></script>
   <script src="widget/main.js"></script>

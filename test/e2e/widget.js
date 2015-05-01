@@ -23,11 +23,7 @@
       return browser.ignoreSynchronization = true;
     });
 
-    it("Should apply correct background color", function () {
-      // body background color
-      expect(element(by.css("body")).getAttribute("style")).
-        to.eventually.equal("background: rgba(255, 255, 255, 0);");
-    });
+    //TODO: test scenarios
 
   });
 

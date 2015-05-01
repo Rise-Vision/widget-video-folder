@@ -47,10 +47,6 @@
           <p id="folder-error" class="text-danger text-validation" ng-show="!isFolder">
             {{"widgets.errors.storage-folder" | translate}}
           </p>
-          <!-- Order -->
-          <div class="form-group">
-            <order order="settings.additionalParams.order"></order>
-          </div>
           <!-- Video -->
           <div class="section">
             <h5>{{"video.heading" | translate}}</h5>
@@ -92,13 +88,6 @@
                 </div>
               </div>
             </div>
-          </div>
-          <!-- Background Image Setting -->
-          <div class="section">
-            <h5>{{"background.heading" | translate}}</h5>
-            <background-image-setting name="background" background="settings.additionalParams.background"
-                                      company-id="{{settings.params.companyId}}"
-                                      ng-model="backgroundsetting" valid></background-image-setting>
           </div>
         </form>
       </div>

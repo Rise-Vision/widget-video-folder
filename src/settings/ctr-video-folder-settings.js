@@ -24,16 +24,6 @@ angular.module("risevision.widget.video-folder.settings")
         return $scope.isFolder;
       }
 
-      $scope.$watch("settings.additionalParams.background.image.url", function (url) {
-        if (typeof url !== "undefined" && url !== "") {
-          if ($scope.settingsForm.background.$valid ) {
-            $scope.settings.additionalParams.backgroundStorage = commonSettings.getStorageUrlData(url);
-          } else {
-            $scope.settings.additionalParams.backgroundStorage = {};
-          }
-        }
-      });
-
       $scope.$watch("settings.additionalParams.url", function (url) {
         if (url !== undefined && url !== "") {
           if ($scope.settingsForm.videoFolderUrl.$valid) {
@@ -55,15 +45,12 @@ angular.module("risevision.widget.video-folder.settings")
     additionalParams: {
       url: "",
       storage: {},
-      order: "alpha-asc",
       video: {
         scaleToFit: true,
         volume: 50,
         controls: true,
         autoplay: true,
         pause: 10
-      },
-      background: {},
-      backgroundStorage: {}
+      }
     }
   });

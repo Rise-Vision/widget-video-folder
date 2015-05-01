@@ -31,13 +31,6 @@
 
       // URL Field
       expect(element(by.model("url")).isPresent()).to.eventually.be.true;
-
-      // Order
-      expect(element(by.model("order")).isPresent()).to.eventually.be.true;
-
-      // Background Image Setting
-      expect(element(by.model("background.color")).isPresent()).to.eventually.be.true;
-
     });
 
     it("Should correctly load default settings", function () {
@@ -49,9 +42,6 @@
 
       // Video Folder URL input value should be empty
       expect(element(by.model("url")).getAttribute("value")).to.eventually.equal("");
-
-      // Order should be A - Z
-      expect(element(by.model("order")).getAttribute("value")).to.eventually.equal("alpha-asc");
 
       // Scale To Fit should be true
       expect(element(by.model("settings.additionalParams.video.scaleToFit")).isSelected()).to.eventually.be.true;
@@ -107,24 +97,13 @@
             "folder": "videos/",
             "fileName": ""
           },
-          "order": "alpha-asc",
           "video": {
             "scaleToFit": true,
             "volume":50,
             "controls": true,
             "autoplay":true,
             "pause": 10
-          },
-          "background": {
-            "color": "rgba(255,255,255,0)",
-            "useImage": false,
-            "image": {
-              "url": "",
-              "position": "top-left",
-              "scale": true
-            }
-          },
-          "backgroundStorage": {}
+          }
         }
       };
 

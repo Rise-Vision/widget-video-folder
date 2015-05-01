@@ -12,25 +12,14 @@
         "folder": "Widgets/videos/",
         "fileName": ""
       },
-      "order": "alpha-asc",
-      "pause": 10,
       "video": {
-        "autoplay": true,
         "scaleToFit": true,
-        "volume": 50
-      },
-      "background": {
-        "color": "rgba(255,255,255,0)",
-        "useImage": false,
-        "image": {
-          "url": "",
-          "position": "top-left",
-          "scale": true
-        }
-      },
-      "backgroundStorage": {}
+        "volume":50,
+        "controls": true,
+        "autoplay":true,
+        "pause": 10
+      }
     }
   };
-
 
 })(window);
