@@ -9,7 +9,6 @@ RiseVision.VideoFolder = (function (gadgets) {
   var _additionalParams;
 
   var _prefs = null,
-    _background = null,
     _storage = null,
     _frameController = null;
 
@@ -30,11 +29,6 @@ RiseVision.VideoFolder = (function (gadgets) {
   function _ready() {
     gadgets.rpc.call("", "rsevent_ready", null, _prefs.getString("id"),
       true, true, true, true, true);
-  }
-
-  function _backgroundReady() {
-    _storage = new RiseVision.VideoFolder.Storage(_additionalParams);
-    _storage.init();
   }
 
   function _refreshFrame(frameIndex) {
@@ -137,9 +131,9 @@ RiseVision.VideoFolder = (function (gadgets) {
         _additionalParams.width = _prefs.getInt("rsW");
         _additionalParams.height = _prefs.getInt("rsH");
 
-        // create and initialize the Background instance
-        _background = new RiseVision.Common.Background(_additionalParams);
-        _background.init(_backgroundReady);
+        // create and initialize the Storage module instance
+        _storage = new RiseVision.VideoFolder.Storage(_additionalParams);
+        _storage.init();
       }
     }
   }
