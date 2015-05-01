@@ -2,7 +2,7 @@
 /* exported config */
 if (typeof config === "undefined") {
   var config = {
-    SKIN: "skin/six.xml"
+    SKIN: "skin/RVSkin.xml"
   };
 
   if (typeof angular !== "undefined") {
