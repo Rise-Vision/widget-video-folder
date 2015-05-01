@@ -5,7 +5,7 @@
   <title>Video Folder Settings</title>
 
   <!-- build:css css/settings.min.css -->
-  <link rel="stylesheet" href="components/common-style/dist/css/rise.min.css">
+  <link rel="stylesheet" href="components/rv-common-style/dist/css/rise.min.css">
   <link rel="stylesheet" href="components/bootstrap-select/bootstrap-select.css">
   <link rel="stylesheet" href="components/rv-bootstrap-formhelpers/dist/css/rv-bootstrap-formhelpers.css">
   <link rel="stylesheet" href="components/rv-angular-bootstrap-colorpicker/css/colorpicker.css">
@@ -47,6 +47,7 @@
           <label>{{"widgets.storage.folder.url" | translate}}</label>
           <url-field name="videoFolderUrl" url="settings.additionalParams.url" hide-label="true"
                      company-id="{{settings.params.companyId}}"
+                     storage-type="single-folder"
                      ng-model="urlentry" valid></url-field>
           <p id="folder-error" class="text-danger text-validation" ng-show="!isFolder">
             {{"widgets.errors.storage-folder" | translate}}
