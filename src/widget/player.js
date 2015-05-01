@@ -20,9 +20,10 @@ function init(params, list, skinVal) {
   skin = skinVal;
   controls = params.video.controls;
   volume = params.video.volume;
-  autoPlay = params.video.autoplay;
   scaleToFit = params.video.scaleToFit;
 
+  // ensure autoPlay is true if controls value is false, otherwise use params value
+  autoPlay = (!controls) ? true : params.video.autoplay;
   // convert pause value to number if type is "string"
   params.video.pause = (typeof params.video.pause === "string") ? parseInt(params.video.pause, 10) : params.video.pause;
   // if not of type "number", set its value to 0 so a pause does not get applied
