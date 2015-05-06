@@ -110,27 +110,58 @@
   });
 
   gulp.task("webdriver_update", factory.webdriveUpdate());
-  gulp.task("test:metrics", factory.metrics());
 
   // ***** e2e Testing ***** //
   gulp.task("e2e:server-close", factory.testServerClose());
 
-  gulp.task("e2e:server", ["config", "html:e2e"], factory.testServer());
+  gulp.task("html:e2e:settings", factory.htmlE2E());
 
-  gulp.task("html:e2e",
-    factory.htmlE2E({
-      files: ["./src/settings.html", "./src/widget.html"],
-      e2egadgets: "../node_modules/widget-tester/mocks/gadget-mocks.js",
-      e2eMockData: "../test/mock-data.js",
-      e2eStorageMock: "../node_modules/widget-tester/mocks/rise-storage-mock.js"
-    }));
+  gulp.task("e2e:server:settings", ["config", "html:e2e:settings"], factory.testServer());
 
-  gulp.task("test:e2e:run", ["webdriver_update"], factory.testE2EAngular({
-      testFiles: ["test/e2e/settings.js", "test/e2e/widget.js"]}
+  gulp.task("test:e2e:settings:run", ["webdriver_update"], factory.testE2EAngular({
+      testFiles: "test/e2e/settings.js"}
   ));
 
+  gulp.task("test:e2e:settings", function(cb) {
+    runSequence(["e2e:server:settings"], "test:e2e:settings:run", "e2e:server-close", cb);
+  });
+
   gulp.task("test:e2e", function(cb) {
-    runSequence(["e2e:server"], "test:e2e:run", "e2e:server-close", cb);
+    runSequence("test:e2e:settings", cb);
+  });
+
+  // ****** Unit Testing ***** //
+  gulp.task("test:unit:settings", factory.testUnitAngular(
+    {testFiles: [
+      "src/components/jquery/dist/jquery.js",
+      "src/components/angular/angular.js",
+      "src/components/angular-mocks/angular-mocks.js",
+      "src/components/angular-translate/angular-translate.js",
+      "src/components/angular-translate-loader-static-files/angular-translate-loader-static-files.js",
+      "node_modules/widget-tester/mocks/common-mock.js",
+      "src/components/bootstrap-sass-official/assets/javascripts/bootstrap.js",
+      "src/components/angular-bootstrap/ui-bootstrap-tpls.js",
+      "src/components/widget-settings-ui-components/dist/js/**/*.js",
+      "src/components/widget-settings-ui-core/dist/*.js",
+      "src/components/component-storage-selector/dist/storage-selector.js",
+      "src/components/bootstrap-form-components/dist/js/**/*.js",
+      "src/components/seiyria-bootstrap-slider/dist/bootstrap-slider.min.js",
+      "src/components/angular-bootstrap-slider/slider.js",
+      "src/config/test.js",
+      "src/settings/settings-app.js",
+      "src/settings/**/*.js",
+      "test/unit/settings/**/*spec.js"]}
+  ));
+
+  gulp.task("test:unit:player", factory.testUnitAngular(
+    {testFiles: [
+      "src/config/test.js",
+      "src/widget/player.js",
+      "test/unit/widget/player-spec.js"]}
+  ));
+
+  gulp.task("test:unit", function(cb) {
+    runSequence("test:unit:player", "test:unit:settings", cb);
   });
 
   // ***** Primary Tasks ***** //
@@ -142,7 +173,7 @@
   });
 
   gulp.task("test", function(cb) {
-    runSequence("test:e2e", "test:metrics", cb);
+    runSequence("test:unit", "test:e2e", cb);
   });
 
   gulp.task("build", function (cb) {

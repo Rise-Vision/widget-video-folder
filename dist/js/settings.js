@@ -28566,7 +28566,7 @@ angular.module("risevision.widget.video-folder.settings")
 
       $scope.isFolder = true;
 
-      function isFolderSelected(url) {
+      $scope.isFolderSelected = function (url) {
         var params = url.split("?"),
           pair;
 
@@ -28584,12 +28584,12 @@ angular.module("risevision.widget.video-folder.settings")
         $scope.settingsForm.$setValidity("videoFolderUrl", $scope.isFolder);
 
         return $scope.isFolder;
-      }
+      };
 
       $scope.$watch("settings.additionalParams.url", function (url) {
         if (url !== undefined && url !== "") {
           if ($scope.settingsForm.videoFolderUrl.$valid) {
-            if (isFolderSelected(url)) {
+            if ($scope.isFolderSelected(url)) {
               $scope.settings.additionalParams.storage = commonSettings.getStorageUrlData(url);
             } else {
               $scope.settings.additionalParams.storage = {};
