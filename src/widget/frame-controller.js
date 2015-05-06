@@ -60,6 +60,7 @@ RiseVision.VideoFolder.FrameController = function () {
 
         // initialize and load the player inside the iframe
         frameObj.init(params, files, config.SKIN);
+        frameObj.load();
       };
 
       iframe.setAttribute("src", "player.html");

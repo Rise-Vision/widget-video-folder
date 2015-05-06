@@ -46,7 +46,7 @@
       // Scale To Fit should be true
       expect(element(by.model("settings.additionalParams.video.scaleToFit")).isSelected()).to.eventually.be.true;
 
-      // Show Video Controls should be false
+      // Show Video Controls should be true
       expect(element(by.model("settings.additionalParams.video.controls")).isSelected()).to.eventually.be.true;
 
       // Autoplay should be true
@@ -85,6 +85,12 @@
 
       // form should be valid due to valid URL and valid format
       expect(element(by.css("form[name='settingsForm'].ng-invalid")).isPresent()).to.eventually.be.false;
+    });
+
+    it("Should hide Autoplay and Resume if Show Video Controls unchecked", function () {
+      element(by.model("settings.additionalParams.video.controls")).click();
+
+      expect(element(by.model("settings.additionalParams.video.autoplay")).isDisplayed()).to.eventually.be.false;
     });
 
     it("Should correctly save settings", function (done) {

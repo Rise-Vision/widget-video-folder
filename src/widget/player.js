@@ -1,12 +1,6 @@
 var files;
-var controls, volume, autoPlay, scaleToFit, pauseDuration;
+var controls, volume, autoPlay, stretching, pauseDuration;
 var width, height, skin;
-
-var isLoading = true,
-  pauseHandlerOn = false;
-
-var viewerPaused = false;
-var pauseTimer = null;
 
 var player = null;
 
@@ -20,31 +14,41 @@ function init(params, list, skinVal) {
   skin = skinVal;
   controls = params.video.controls;
   volume = params.video.volume;
-  scaleToFit = params.video.scaleToFit;
+  stretching = (params.video.scaleToFit) ? "uniform" : "none";
 
   // ensure autoPlay is true if controls value is false, otherwise use params value
   autoPlay = (!controls) ? true : params.video.autoplay;
   // convert pause value to number if type is "string"
   params.video.pause = (typeof params.video.pause === "string") ? parseInt(params.video.pause, 10) : params.video.pause;
+
   // if not of type "number", set its value to 0 so a pause does not get applied
-  pauseDuration = (typeof params.video.pause === "number") ? params.video.pause : 0;
+  pauseDuration = (isNaN(params.video.pause)) ? 0 : params.video.pause;
 
   files = list;
 
   player = new PlayerJW();
+}
+
+function load() {
   player.loadVideo();
 }
 
 function doneEvent() {
-  parent.RiseVision.VideoFolder.playerEnded();
+  if (window.parent !== window.top) {
+    parent.RiseVision.VideoFolder.playerEnded();
+  }
 }
 
 function readyEvent() {
-  parent.RiseVision.VideoFolder.playerReady();
+  if (window.parent !== window.top) {
+    parent.RiseVision.VideoFolder.playerReady();
+  }
 }
 
 function errorEvent(data) {
-  parent.RiseVision.VideoFolder.playerError(data);
+  if (window.parent !== window.top) {
+    parent.RiseVision.VideoFolder.playerError(data);
+  }
 }
 
 function play() {
@@ -73,40 +77,11 @@ function getPlaybackData() {
 }
 
 function PlayerJW() {
-  function getVideoFileType(url) {
-    var extensions = [".mp4", ".webm", ".ogg", ".ogv"],
-      urlLowercase = url.toLowerCase(),
-      type = null,
-      i;
+  var isLoading = true,
+    pauseHandlerOn = false,
+    viewerPaused = false;
 
-    for (i = 0; i <= extensions.length; i += 1) {
-      if (urlLowercase.indexOf(extensions[i]) !== -1) {
-        type = extensions[i].substr(extensions[i].lastIndexOf(".") + 1);
-        break;
-      }
-    }
-
-    if (type === "ogv") {
-      type = "ogg";
-    }
-
-    return type;
-  }
-
-  function getPlaylist() {
-    var playlist = [];
-
-    for (var i = 0; i < files.length; i += 1) {
-      playlist.push({
-        sources: [{
-          file: files[i],
-          type: getVideoFileType(files[i])
-        }]
-      });
-    }
-
-    return playlist;
-  }
+  var pauseTimer = null;
 
   function onPlaylistComplete() {
     doneEvent();
@@ -178,13 +153,48 @@ function PlayerJW() {
     }
   }
 
+  this.getVideoFileType = function (url) {
+    var extensions = [".mp4", ".webm", ".ogg", ".ogv"],
+      urlLowercase = url.toLowerCase(),
+      type = null,
+      i;
+
+    for (i = 0; i <= extensions.length; i += 1) {
+      if (urlLowercase.indexOf(extensions[i]) !== -1) {
+        type = extensions[i].substr(extensions[i].lastIndexOf(".") + 1);
+        break;
+      }
+    }
+
+    if (type === "ogv") {
+      type = "ogg";
+    }
+
+    return type;
+  };
+
+  this.getPlaylist = function (list) {
+    var playlist = [];
+
+    for (var i = 0; i < list.length; i += 1) {
+      playlist.push({
+        sources: [{
+          file: list[i],
+          type: this.getVideoFileType(list[i])
+        }]
+      });
+    }
+
+    return playlist;
+  };
+
   this.loadVideo = function() {
     jwplayer("player").setup({
-      playlist: getPlaylist(),
+      playlist: this.getPlaylist(files),
       width : width,
       height : height,
       controls: false,
-      stretching : scaleToFit ? "uniform" : "none",
+      stretching : stretching,
       skin: skin
     });
 
