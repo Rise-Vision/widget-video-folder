@@ -15,20 +15,13 @@
 </head>
 <body>
 
-  <rise-storage id="videoFolderStorage" refresh="15"></rise-storage>
+  <rise-storage id="videoFolderStorage" refresh="5" fileType="video"></rise-storage>
 
   <div id="videoContainer">
     <div id="if_0" class="frameContainer"></div>
     <div id="if_1" class="frameContainer"></div>
   </div>
 
-  <!-- build:e2eMockData -->
-  <!-- endbuild -->
-
-  <!-- build:e2eStorageMock -->
-  <!-- endbuild -->
-
-  <!-- build:e2egadgets -->
   <script src="//rvashow2.appspot.com/gadgets/gadgets.min.js"></script>
   <!-- endbuild -->
 
@@ -36,12 +29,10 @@
   <script src="config/config.js"></script>
   <script src="widget/video-folder.js"></script>
   <script src="widget/storage.js"></script>
-  <script src="widget/frame-controller.js"></script>
+  <script src="components/widget-common/dist/video.js"></script>
   <script src="widget/main.js"></script>
   <script src="widget/analytics.js"></script>
   <!-- endbuild -->
 
-  <!-- build:e2ePolymerReadyMock -->
-  <!-- endbuild -->
 </body>
 </html>

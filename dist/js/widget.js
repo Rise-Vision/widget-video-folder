@@ -12,7 +12,7 @@ if (typeof config === "undefined") {
   }
 }
 
-/* global gadgets */
+/* global gadgets, config */
 
 var RiseVision = RiseVision || {};
 RiseVision.VideoFolder = {};
@@ -49,7 +49,7 @@ RiseVision.VideoFolder = (function (gadgets) {
     _frameController.remove(frameIndex, function () {
       _frameController.add(frameIndex);
       _frameController.hide(frameIndex);
-      _frameController.createFramePlayer(frameIndex, _additionalParams, _currentFiles);
+      _frameController.createFramePlayer(frameIndex, _additionalParams, _currentFiles, config.SKIN, "player.html");
     });
   }
 
@@ -59,13 +59,13 @@ RiseVision.VideoFolder = (function (gadgets) {
   function onStorageInit(urls) {
     _currentFiles = urls;
 
-    _frameController = new RiseVision.VideoFolder.FrameController();
+    _frameController = new RiseVision.Common.Video.FrameController();
 
     // add the first frame and create its player
     _frameController.add(0);
     _currentFrame = 0;
     _frameCount = 1;
-    _frameController.createFramePlayer(0, _additionalParams, _currentFiles);
+    _frameController.createFramePlayer(0, _additionalParams, _currentFiles, config.SKIN, "player.html");
   }
 
   function onStorageRefresh(urls) {
@@ -124,7 +124,7 @@ RiseVision.VideoFolder = (function (gadgets) {
         // re-add previously removed frame and create the player, but hide visibility
         _frameController.add(((_currentFrame === 0) ? 1 : 0));
         _frameController.hide(((_currentFrame === 0) ? 1 : 0));
-        _frameController.createFramePlayer(((_currentFrame === 0) ? 1 : 0), _additionalParams, _currentFiles);
+        _frameController.createFramePlayer(((_currentFrame === 0) ? 1 : 0), _additionalParams, _currentFiles, config.SKIN, "player.html");
       }
     } else {
       // This flag only got set upon a refresh of hidden frame and there was an error in setup or first video
@@ -180,7 +180,7 @@ RiseVision.VideoFolder = (function (gadgets) {
         _frameController.add(1);
         _frameController.hide(1);
         _frameCount = 2;
-        _frameController.createFramePlayer(1, _additionalParams, _currentFiles);
+        _frameController.createFramePlayer(1, _additionalParams, _currentFiles, config.SKIN, "player.html");
       }
     }
   }
@@ -274,78 +274,22 @@ RiseVision.VideoFolder.Storage = function (data) {
   };
 };
 
-/* global config */
-
 var RiseVision = RiseVision || {};
-RiseVision.VideoFolder = RiseVision.VideoFolder || {};
+RiseVision.Common = RiseVision.Common || {};
 
-RiseVision.VideoFolder.FrameController = function () {
+RiseVision.Common.Video = RiseVision.Common.Video || {};
+
+RiseVision.Common.Video.FrameController = function () {
   "use strict";
 
   var PREFIX = "if_";
 
-  /*
-   *  Private Methods
-   */
-  function _clear(index) {
-    var frameContainer = document.getElementById(PREFIX + index),
-      iframe, frameObj;
-
-    try {
-      iframe = frameContainer.querySelector("iframe");
-      frameObj = (iframe.contentWindow) ? iframe.contentWindow :
-        (iframe.contentDocument.document) ? iframe.contentDocument.document : iframe.contentDocument;
-      frameObj.remove();
-      iframe.setAttribute("src", "about:blank");
-    }
-    catch (e) {
-      console.debug(e);
-    }
-
-  }
-
-  /*
-   *  Public Methods
-   */
-
-  function add(index) {
-    var frameContainer, iframe;
-
-    frameContainer = document.getElementById(PREFIX + index);
-
-    iframe = document.createElement("iframe");
-    iframe.setAttribute("allowTransparency", true);
-    iframe.setAttribute("frameborder", "0");
-    iframe.setAttribute("scrolling", "no");
-
-    frameContainer.appendChild(iframe);
-  }
-
-  function createFramePlayer(index, params, files) {
-    var frameContainer = document.getElementById(PREFIX + index),
-      iframe;
-
-    iframe = frameContainer.querySelector("iframe");
-
-    if (iframe) {
-      iframe.onload = function () {
-        iframe.onload = null;
-
-        var frameObj = (iframe.contentWindow) ? iframe.contentWindow :
-          (iframe.contentDocument.document) ? iframe.contentDocument.document : iframe.contentDocument;
-
-        // initialize and load the player inside the iframe
-        frameObj.init(params, files, config.SKIN);
-        frameObj.load();
-      };
-
-      iframe.setAttribute("src", "player.html");
-    }
-
+  function getFrameContainer(index) {
+    return document.getElementById(PREFIX + index);
   }
 
   function getFrameObject(index) {
-    var frameContainer = document.getElementById(PREFIX + index),
+    var frameContainer = getFrameContainer(index),
       iframe;
 
     iframe = frameContainer.querySelector("iframe");
@@ -358,8 +302,54 @@ RiseVision.VideoFolder.FrameController = function () {
     return null;
   }
 
+  function _clear(index) {
+    var frameContainer = getFrameContainer(index),
+      frameObj = getFrameObject(index),
+      iframe;
+
+    if (frameObj) {
+      iframe = frameContainer.querySelector("iframe");
+      frameObj.remove();
+      iframe.setAttribute("src", "about:blank");
+    }
+  }
+
+  function add(index) {
+    var frameContainer = getFrameContainer(index),
+      iframe = document.createElement("iframe");
+
+    iframe.setAttribute("allowTransparency", true);
+    iframe.setAttribute("frameborder", "0");
+    iframe.setAttribute("scrolling", "no");
+
+    frameContainer.appendChild(iframe);
+  }
+
+  function createFramePlayer(index, params, files, skin, src) {
+    var frameContainer = getFrameContainer(index),
+      frameObj = getFrameObject(index),
+      iframe;
+
+    if (frameObj) {
+      iframe = frameContainer.querySelector("iframe");
+
+      iframe.onload = function () {
+        iframe.onload = null;
+
+        // initialize and load the player inside the iframe
+        frameObj.init(params, files, skin);
+        frameObj.load();
+      };
+
+      iframe.setAttribute("src", src);
+    }
+
+  }
+
   function hide(index) {
-    document.getElementById(PREFIX + index).style.visibility = "hidden";
+    var frameContainer = getFrameContainer(index);
+
+    frameContainer.style.visibility = "hidden";
   }
 
   function remove(index, callback) {
@@ -380,12 +370,15 @@ RiseVision.VideoFolder.FrameController = function () {
   }
 
   function show(index) {
-    document.getElementById(PREFIX + index).style.visibility = "visible";
+    var frameContainer = getFrameContainer(index);
+
+    frameContainer.style.visibility = "visible";
   }
 
   return {
     add: add,
     createFramePlayer: createFramePlayer,
+    getFrameContainer: getFrameContainer,
     getFrameObject: getFrameObject,
     hide: hide,
     remove: remove,

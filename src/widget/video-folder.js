@@ -1,4 +1,4 @@
-/* global gadgets */
+/* global gadgets, config */
 
 var RiseVision = RiseVision || {};
 RiseVision.VideoFolder = {};
@@ -35,7 +35,7 @@ RiseVision.VideoFolder = (function (gadgets) {
     _frameController.remove(frameIndex, function () {
       _frameController.add(frameIndex);
       _frameController.hide(frameIndex);
-      _frameController.createFramePlayer(frameIndex, _additionalParams, _currentFiles);
+      _frameController.createFramePlayer(frameIndex, _additionalParams, _currentFiles, config.SKIN, "player.html");
     });
   }
 
@@ -45,13 +45,13 @@ RiseVision.VideoFolder = (function (gadgets) {
   function onStorageInit(urls) {
     _currentFiles = urls;
 
-    _frameController = new RiseVision.VideoFolder.FrameController();
+    _frameController = new RiseVision.Common.Video.FrameController();
 
     // add the first frame and create its player
     _frameController.add(0);
     _currentFrame = 0;
     _frameCount = 1;
-    _frameController.createFramePlayer(0, _additionalParams, _currentFiles);
+    _frameController.createFramePlayer(0, _additionalParams, _currentFiles, config.SKIN, "player.html");
   }
 
   function onStorageRefresh(urls) {
@@ -110,7 +110,7 @@ RiseVision.VideoFolder = (function (gadgets) {
         // re-add previously removed frame and create the player, but hide visibility
         _frameController.add(((_currentFrame === 0) ? 1 : 0));
         _frameController.hide(((_currentFrame === 0) ? 1 : 0));
-        _frameController.createFramePlayer(((_currentFrame === 0) ? 1 : 0), _additionalParams, _currentFiles);
+        _frameController.createFramePlayer(((_currentFrame === 0) ? 1 : 0), _additionalParams, _currentFiles, config.SKIN, "player.html");
       }
     } else {
       // This flag only got set upon a refresh of hidden frame and there was an error in setup or first video
@@ -166,7 +166,7 @@ RiseVision.VideoFolder = (function (gadgets) {
         _frameController.add(1);
         _frameController.hide(1);
         _frameCount = 2;
-        _frameController.createFramePlayer(1, _additionalParams, _currentFiles);
+        _frameController.createFramePlayer(1, _additionalParams, _currentFiles, config.SKIN, "player.html");
       }
     }
   }
