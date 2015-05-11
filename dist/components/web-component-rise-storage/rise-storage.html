@@ -199,7 +199,7 @@
       /**
        * The number of files in a folder that have already been processed.
        *
-       * @attribute numFiles
+       * @property numFiles
        * @type number
        * @default 0
        */
@@ -208,11 +208,20 @@
       /**
        * The total number of files in a folder.
        *
-       * @attribute totalFiles
+       * @property totalFiles
        * @type number
        * @default 0
        */
       totalFiles: 0,
+
+      /**
+       * The total number of files in a folder from the last request.
+       *
+       * @property totalFilesBefore
+       * @type number
+       * @default 0
+       */
+      totalFilesBefore: 0,
 
       /**
        * Stores details about a particular file in a folder.
@@ -511,12 +520,7 @@
           this.numFiles = 0;
           this.files = [];
           this.isChanged = false;
-
-          // If number of files in the folder has changed, then file(s) have either been added
-          // or removed.
-          if (this.totalFiles !== (resp.items.length - 1)) {
-            this.isChanged = true;
-          }
+          this.totalFilesBefore = this.totalFiles;
 
           // One item is the folder itself.
           this.totalFiles = resp.items.length - 1;
@@ -524,6 +528,11 @@
           resp.items.forEach(function(item) {
             // Check that current item is not a folder.
             if (item.name && (item.name.slice(-1) !== "/")) {
+              if (!self.filterFiles(item.contentType)) {
+                self.totalFiles--;
+                return;
+              }
+
               self.setFileUrl(item);
               self.cacheUrl = self.baseCacheUrl + "cb=" + new Date().getTime() + "?url=" + self.fileUrl;
               self.$.cache.go();
@@ -635,8 +644,6 @@
                 "fullUrl": file.url,
                 "url": url
               });
-
-              this.isChanged = true;
             }
             // Existing file
             else {
@@ -659,6 +666,12 @@
         this.numFiles++;
 
         if (this.numFiles === this.totalFiles) {
+          // If number of files in the folder has changed, then file(s) have either been added
+          // or removed.
+          if (this.totalFiles !== this.totalFilesBefore) {
+            this.isChanged = true;
+          }
+
           if (this.isLoading || this.isChanged) {
             this.fire("rise-storage-response", this.prepareResponse(this.files));
           }

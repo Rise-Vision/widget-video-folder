@@ -36,8 +36,8 @@
     "angular-bootstrap-slider": "~0.0.6",
     "rv-common-style": "https://github.com/Rise-Vision/common-style.git",
     "webcomponentsjs": "~0.6.0",
-    "web-component-rise-storage": "https://github.com/Rise-Vision/web-component-rise-storage.git#1.0.6",
-    "widget-common": "https://github.com/Rise-Vision/widget-common.git#0.1.9",
+    "web-component-rise-storage": "https://github.com/Rise-Vision/web-component-rise-storage.git#1.0.7",
+    "widget-common": "https://github.com/Rise-Vision/widget-common.git#0.1.10",
     "widget-settings-ui-components": "https://github.com/Rise-Vision/widget-settings-ui-components.git#0.1.12",
     "widget-settings-ui-core": "https://github.com/Rise-Vision/widget-settings-ui-core.git#0.1.11"
   },
