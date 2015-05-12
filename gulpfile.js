@@ -89,7 +89,7 @@
   });
 
   gulp.task("skin", function() {
-    gulp.src("src/widget/skin/RVSkin.xml")
+    gulp.src("src/components/widget-common/dist/assets/video/RVSkin.xml")
       .pipe(gulp.dest("dist/skin"));
   });
 
@@ -102,7 +102,7 @@
     return gulp.src([
       "src/components/webcomponentsjs/webcomponents*.js",
       "src/components/web-component-rise-storage/rise-storage.html",
-      "src/components/polymer/**/*.*{html,js}",
+      "src/components/polymer/*.*{html,js}",
       "src/components/core-ajax/*.*{html,js}",
       "src/components/underscore/*.js"
     ], {base: "./src/"})
