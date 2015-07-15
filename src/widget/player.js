@@ -77,9 +77,7 @@ function getPlaybackData() {
 }
 
 function PlayerJW() {
-  var isLoading = true,
-    pauseHandlerOn = false,
-    viewerPaused = false;
+  var viewerPaused = false;
 
   var pauseTimer = null;
 
@@ -87,37 +85,8 @@ function PlayerJW() {
     doneEvent();
   }
 
-  function onPlay() {
-    if (isLoading) {
-      isLoading = false;
-
-      jwplayer().pause();
-      jwplayer().setMute(false);
-      jwplayer().setVolume(volume);
-
-      if (controls && !autoPlay) {
-        jwplayer().setControls(true);
-      }
-
-      readyEvent();
-
-    } else {
-      if (controls && pauseDuration > 1 && !pauseHandlerOn) {
-        pauseHandlerOn = true;
-
-        // now define pause handler
-        jwplayer().onPause(function () {
-          onPause();
-        });
-      }
-
-      clearTimeout(pauseTimer);
-    }
-
-  }
-
   function onPause() {
-    if (!viewerPaused && !isLoading) {
+    if (!viewerPaused) {
       // user has paused, set a timer to play again
       clearTimeout(pauseTimer);
 
@@ -218,18 +187,23 @@ function PlayerJW() {
         onPlaylistComplete();
       });
 
-      jwplayer().onPlay(function () {
-        onPlay();
-      });
-
       jwplayer().onError(function (error) {
         onPlayerError(error);
       });
 
-      setTimeout(function () {
-        // need to test if there is an error playing first video
-        jwplayer().play();
-      }, 200);
+      if (controls && pauseDuration > 1) {
+        jwplayer().onPause(function () {
+          onPause();
+        });
+      }
+
+      jwplayer().setVolume(volume);
+
+      if (controls && !autoPlay) {
+        jwplayer().setControls(true);
+      }
+
+      readyEvent();
 
     });
   };

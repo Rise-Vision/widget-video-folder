@@ -17,8 +17,6 @@ RiseVision.VideoFolder = (function (gadgets) {
 
   var _currentFiles, _currentFrame;
 
-  var _frameCount = 0;
-
   /*
    *  Private Methods
    */
@@ -27,16 +25,19 @@ RiseVision.VideoFolder = (function (gadgets) {
   }
 
   function _ready() {
+    console.log("video-folder.js::_ready()", _additionalParams.storage.folder);
+
     gadgets.rpc.call("", "rsevent_ready", null, _prefs.getString("id"),
       true, true, true, true, true);
   }
 
-  function _refreshFrame(frameIndex) {
-    _frameController.remove(frameIndex, function () {
-      _frameController.add(frameIndex);
-      _frameController.hide(frameIndex);
-      _frameController.createFramePlayer(frameIndex, _additionalParams, _currentFiles, config.SKIN, "player.html");
-    });
+  function _init() {
+    _frameController = new RiseVision.Common.Video.FrameController();
+
+    // add the first frame and create its player
+    _frameController.add(0);
+    _currentFrame = 0;
+    _frameController.createFramePlayer(0, _additionalParams, _currentFiles, config.SKIN, "player.html");
   }
 
   /*
@@ -45,44 +46,15 @@ RiseVision.VideoFolder = (function (gadgets) {
   function onStorageInit(urls) {
     _currentFiles = urls;
 
-    _frameController = new RiseVision.Common.Video.FrameController();
-
-    // add the first frame and create its player
-    _frameController.add(0);
-    _currentFrame = 0;
-    _frameCount = 1;
-    _frameController.createFramePlayer(0, _additionalParams, _currentFiles, config.SKIN, "player.html");
+    _init();
   }
 
   function onStorageRefresh(urls) {
-    var currentFrameObj = _frameController.getFrameObject(_currentFrame),
-      hiddenFrameIndex = (_currentFrame === 0) ? 1 : 0,
-      currentFrameData;
-
     _currentFiles = urls;
 
-    // It is best to let refreshing the frame playlist happen in the normal cycle of frame swapping (playlist completion)
-    // Below is the only criteria for safely forcing a refresh of hidden frame while Widget is in a "play" or "pause" state
-
-    // Widget is in a state of "play" or "pause" and playlist has not completed. A hidden frame definitely exists
-    if (currentFrameObj) {
-      // Only if there are no video controls.
-      // User interacting with controls, particularly seeking and skipping videos, would cause issues
-      if (!_additionalParams.video.controls) {
-        currentFrameData = currentFrameObj.getPlaybackData();
-
-        if (currentFrameData.total === (currentFrameData.index + 1)) {
-          // To be safe, only refresh the frame that's currently hidden if at least 15 seconds are left of final video
-          if ((currentFrameData.duration - currentFrameData.position) >= 15) {
-            _refreshFrame(hiddenFrameIndex);
-          }
-        } else {
-          // Current frame is not playing last video in list, safe to refresh the frame that's currently hidden
-          _refreshFrame(hiddenFrameIndex);
-        }
-      }
-    }
-
+    // in case refreshed files fix an error with previous setup or initial file problem,
+    // ensure flag is removed so playback is attempted again
+    _playbackError = false;
   }
 
   function pause() {
@@ -100,17 +72,11 @@ RiseVision.VideoFolder = (function (gadgets) {
       if (frameObj) {
         frameObj.play();
       } else {
-        // set current frame to be the one visible
-        _currentFrame = (_currentFrame === 0) ? 1 : 0;
-
-        // play the current frame video
-        frameObj = _frameController.getFrameObject(_currentFrame);
-        frameObj.play();
 
         // re-add previously removed frame and create the player, but hide visibility
-        _frameController.add(((_currentFrame === 0) ? 1 : 0));
-        _frameController.hide(((_currentFrame === 0) ? 1 : 0));
-        _frameController.createFramePlayer(((_currentFrame === 0) ? 1 : 0), _additionalParams, _currentFiles, config.SKIN, "player.html");
+        _frameController.add(0);
+        _frameController.createFramePlayer(0, _additionalParams, _currentFiles, config.SKIN, "player.html");
+
       }
     } else {
       // This flag only got set upon a refresh of hidden frame and there was an error in setup or first video
@@ -139,35 +105,20 @@ RiseVision.VideoFolder = (function (gadgets) {
   }
 
   function playerEnded() {
-    if (_playbackError) {
-      // This flag only gets set upon a refresh of hidden frame and there was an error in setup or first video
-      _frameController.remove(_currentFrame);
-      _frameController.remove((_currentFrame === 0) ? 1 : 0);
-
+    _frameController.remove(_currentFrame, function () {
       _done();
-
-    } else {
-      _frameController.show((_currentFrame === 0) ? 1 : 0);
-      _frameController.remove(_currentFrame, function () {
-        _done();
-      });
-    }
-
+    });
   }
 
   function playerReady() {
+    var frameObj;
+
     if (!_initialized) {
-      if (_frameCount === 2) {
-        // both frames have been created and loaded, can notify Viewer widget is ready
-        _initialized = true;
-        _ready();
-      } else {
-        // first frame player was successful and ready, create the second one but hide it
-        _frameController.add(1);
-        _frameController.hide(1);
-        _frameCount = 2;
-        _frameController.createFramePlayer(1, _additionalParams, _currentFiles, config.SKIN, "player.html");
-      }
+      _initialized = true;
+      _ready();
+    } else {
+      frameObj = _frameController.getFrameObject(_currentFrame);
+      frameObj.play();
     }
   }
 
@@ -183,12 +134,11 @@ RiseVision.VideoFolder = (function (gadgets) {
     } else {
       if (error.type === "setup" || error.index === 0) {
         // This only happens in the event of a refresh. New files caused an error in setup or first video has an issue
-        // The error event will be coming from the currently hidden frame when it got recreated with new files to use
         _playbackError = true;
-      } else {
-        // force widget to act as though the playlist is done
-        playerEnded();
       }
+
+      // force widget to act as though the playlist is done
+      playerEnded();
     }
 
   }
