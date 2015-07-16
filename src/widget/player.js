@@ -183,6 +183,9 @@ function PlayerJW() {
 
       document.getElementById("player").className += " notransition";
 
+      // Bugfix - issue #18 (JWPlayer context menu)
+      document.getElementById("player_menu").className += " disable-context-menu";
+
       jwplayer().onPlaylistComplete(function () {
         onPlaylistComplete();
       });
