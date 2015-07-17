@@ -28154,7 +28154,8 @@ app.run(["$templateCache", function($templateCache) {
 /* exported config */
 if (typeof config === "undefined") {
   var config = {
-    SKIN: "skin/RVSkin.xml"
+    SKIN: "skin/RVSkin.xml",
+    STORAGE_ENV: "prod"
   };
 
   if (typeof angular !== "undefined") {

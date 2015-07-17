@@ -31,25 +31,24 @@ RiseVision.VideoFolder = (function (gadgets) {
       true, true, true, true, true);
   }
 
-  function _init() {
-    _frameController = new RiseVision.Common.Video.FrameController();
-
-    // add the first frame and create its player
-    _frameController.add(0);
-    _currentFrame = 0;
-    _frameController.createFramePlayer(0, _additionalParams, _currentFiles, config.SKIN, "player.html");
-  }
-
   /*
    *  Public Methods
    */
   function onStorageInit(urls) {
+    console.log("video-folder.js::onStorageInit", urls);
     _currentFiles = urls;
 
-    _init();
+    // create the FrameController module instance
+    _frameController = new RiseVision.Common.Video.FrameController();
+
+    _currentFrame = 0;
+    _initialized = true;
+
+    _ready();
   }
 
   function onStorageRefresh(urls) {
+    console.log("video-folder.js::onStorageRefresh", urls);
     _currentFiles = urls;
 
     // in case refreshed files fix an error with previous setup or initial file problem,
@@ -73,14 +72,19 @@ RiseVision.VideoFolder = (function (gadgets) {
         frameObj.play();
       } else {
 
-        // re-add previously removed frame and create the player, but hide visibility
-        _frameController.add(0);
-        _frameController.createFramePlayer(0, _additionalParams, _currentFiles, config.SKIN, "player.html");
+        // check the list isn't empty
+        if (_currentFiles && _currentFiles.length > 0) {
+
+          // add frame and create the player
+          _frameController.add(0);
+          _frameController.createFramePlayer(0, _additionalParams, _currentFiles, config.SKIN, "player.html");
+
+        } else {
+          _done();
+        }
 
       }
     } else {
-      // This flag only got set upon a refresh of hidden frame and there was an error in setup or first video
-      // Send Viewer "done"
       _done();
     }
 
@@ -111,36 +115,20 @@ RiseVision.VideoFolder = (function (gadgets) {
   }
 
   function playerReady() {
-    var frameObj;
-
-    if (!_initialized) {
-      _initialized = true;
-      _ready();
-    } else {
-      frameObj = _frameController.getFrameObject(_currentFrame);
-      frameObj.play();
-    }
+    var frameObj = _frameController.getFrameObject(_currentFrame);
+    frameObj.play();
   }
 
   function playerError(error) {
     console.debug("video-folder::playerError()", error);
 
-    if (!_initialized) {
-      // Widget has not sent "ready" yet and there is an error (setup or playback of first video, doesn't matter which)
-      _frameController.remove(_currentFrame);
-
-      // do nothing more, ensure "ready" is not sent to Viewer so that this widget can be skipped
-
-    } else {
-      if (error.type === "setup" || error.index === 0) {
-        // This only happens in the event of a refresh. New files caused an error in setup or first video has an issue
-        _playbackError = true;
-      }
-
-      // force widget to act as though the playlist is done
-      playerEnded();
+    if (error.type === "setup" || error.index === 0) {
+      // Files caused an error in setup or first video has an issue, flag this
+      _playbackError = true;
     }
 
+    // force widget to act as though the playlist is done
+    playerEnded();
   }
 
   function stop() {
