@@ -589,8 +589,10 @@
         this._isChanged = false;
         this._totalFilesBefore = this._totalFiles;
 
-        // One item is the folder itself.
-        this._totalFiles = resp.items.length - 1;
+        // Only count actual files (ignore folders)
+        this._totalFiles = resp.items.filter(function(item) {
+          return item.name && (item.name.slice(-1) !== "/");
+        }).length;
 
         // Remove no longer existing files
         this._processRemovedFiles(resp.items);
