@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <title>Video Widget</title>
+
+  <script src="../../src/components/webcomponentsjs/webcomponents-lite.min.js"></script>
+  <script src="../../src/components/web-component-tester/browser.js"></script>
+
+  <link rel="import" href="../../src/components/rise-storage/rise-storage.html">
+</head>
+<body>
+
+<rise-storage id="videoFolderStorage" refresh="5" fileType="video"></rise-storage>
+
+<div id="videoContainer">
+  <div id="if_0" class="frameContainer"></div>
+</div>
+
+<script src="../data/storage.js"></script>
+
+<script src="../../node_modules/widget-tester/mocks/gadget-mocks.js"></script>
+
+<script src="../../src/config/test.js"></script>
+<script src="../../src/widget/video-folder.js"></script>
+<script src="../../src/widget/storage.js"></script>
+<script src="../../src/components/widget-common/dist/video.js"></script>
+<script src="../../src/widget/main.js"></script>
+
+<script>
+  suite("Video Folder Widget", function() {
+
+    var storage = document.querySelector("rise-storage");
+    suiteSetup(function() {
+    });
+
+    suite("rise-storage configuration", function () {
+      test("should set folder attribute of storage component", function() {
+        assert.equal(storage.folder, "Widgets/videos/");
+      });
+      test("should set companyid attribute of storage component", function() {
+        assert.equal(storage.companyid, "b428b4e8-c8b9-41d5-8a10-b4193c789443");
+      });
+      test("should set env attribute of storage component", function() {
+        assert.equal(storage.env, config.STORAGE_ENV);
+      });
+    });
+
+  });
+</script>
+</body>
+</html>

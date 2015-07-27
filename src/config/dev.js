@@ -9,7 +9,8 @@ if (typeof config === "undefined") {
      CORS will be required. Handy CORS Chrome extension can be found here
      https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi?hl=en
      */
-    SKIN: ""
+    SKIN: "",
+    STORAGE_ENV: "test"
   };
 
   if (typeof angular !== "undefined") {

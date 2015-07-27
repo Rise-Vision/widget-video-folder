@@ -20,6 +20,7 @@
   var bower = require("gulp-bower");
   var del = require("del");
   var colors = require("colors");
+  var wct = require("web-component-tester").gulp.init(gulp);
 
   var appJSFiles = [
     "src/**/*.js",
@@ -101,9 +102,10 @@
   gulp.task("rise-storage", function() {
     return gulp.src([
       "src/components/webcomponentsjs/webcomponents*.js",
-      "src/components/web-component-rise-storage/rise-storage.html",
+      "src/components/rise-storage/rise-storage.html",
       "src/components/polymer/*.*{html,js}",
-      "src/components/core-ajax/*.*{html,js}",
+      "src/components/promise-polyfill/*.*{html,js}",
+      "src/components/iron-ajax/*.*{html,js}",
       "src/components/underscore/*.js"
     ], {base: "./src/"})
       .pipe(gulp.dest("dist/"));
@@ -164,6 +166,15 @@
     runSequence("test:unit:player", "test:unit:settings", cb);
   });
 
+  gulp.task("test:integration:rise-storage", function(cb) {
+    // web component tester (wct)
+    runSequence("test:local", cb);
+  });
+
+  gulp.task("test:integration", function (cb) {
+    runSequence("test:integration:rise-storage", cb);
+  });
+
   // ***** Primary Tasks ***** //
   gulp.task("bower-clean-install", ["clean-bower"], function(cb){
     return bower().on("error", function(err) {
@@ -173,7 +184,7 @@
   });
 
   gulp.task("test", function(cb) {
-    runSequence("test:unit", "test:e2e", cb);
+    runSequence("test:unit", "test:integration", "test:e2e", cb);
   });
 
   gulp.task("build", function (cb) {
