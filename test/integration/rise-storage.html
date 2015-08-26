@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <title>Video Folder Widget</title>
+
+  <script src="../../src/components/webcomponentsjs/webcomponents-lite.min.js"></script>
+  <script src="../../src/components/web-component-tester/browser.js"></script>
+
+  <link rel="import" href="../../src/components/rise-storage/rise-storage.html">
+</head>
+<body>
+
+<rise-storage id="videoFolderStorage" refresh="5" fileType="video"></rise-storage>
+
+<div id="videoContainer">
+  <div id="if_0" class="frameContainer"></div>
+</div>
+
+<script src="../data/storage.js"></script>
+
+<script src="../../node_modules/widget-tester/mocks/gadget-mocks.js"></script>
+
+<script src="../../src/config/test.js"></script>
+<script src="../../src/widget/video-folder.js"></script>
+<script src="../../src/widget/storage.js"></script>
+<script src="../../src/components/widget-common/dist/video.js"></script>
+<script src="../../src/widget/main.js"></script>
+
+<script>
+  var storage = document.querySelector("rise-storage");
+
+  suite("Storage Initialization", function () {
+    // Don't execute tests until rise-storage attributes are set.
+    var check = function(done) {
+      if (storage.companyid !== "") {
+        done();
+      }
+      else {
+        setTimeout(function() {
+          check(done)
+        }, 1000);
+      }
+      },
+      initStub;
+
+    suiteSetup(function (done) {
+      initStub = sinon.stub(RiseVision.VideoFolder, "onStorageInit", function(urls) {});
+
+      check(done);
+    });
+
+    suiteTeardown(function () {
+      RiseVision.VideoFolder.onStorageInit.restore();
+    });
+
+    test("should set folder attribute of storage component", function() {
+      assert.equal(storage.folder, "Widgets/videos/");
+    });
+    test("should set companyid attribute of storage component", function() {
+      assert.equal(storage.companyid, "abc123");
+    });
+    test("should set env attribute of storage component", function() {
+      assert.equal(storage.env, config.STORAGE_ENV);
+    });
+
+  });
+
+  suite("added", function() {
+    var refreshStub;
+
+    suiteSetup(function() {
+      refreshStub = sinon.stub(RiseVision.VideoFolder, "onStorageRefresh", function(urls){});
+
+      storage.dispatchEvent(new CustomEvent("rise-storage-response", {
+        "detail": {
+          "added": true,
+          "name": "Widgets/videos/big_buck_bunny.webm",
+          "url": "https://www.googleapis.com/storage/v1/b/risemedialibrary-b428b4e8-c8b9-41d5-8a10-b4193c789443/o/Widgets%2Fvideos%2Fbig_buck_bunny.webm?alt=media"
+        },
+        "bubbles": true
+      }));
+    });
+
+    suiteTeardown(function() {
+      RiseVision.VideoFolder.onStorageRefresh.restore();
+    });
+
+    test("Should call onStorageRefresh when files added", function () {
+      assert(refreshStub.calledOnce);
+    });
+
+  });
+
+  suite("changed", function() {
+    var refreshStub;
+
+    suiteSetup(function() {
+      refreshStub = sinon.stub(RiseVision.VideoFolder, "onStorageRefresh");
+
+      storage.dispatchEvent(new CustomEvent("rise-storage-response", {
+        "detail": {
+          "changed": true,
+          "name": "Widgets/videos/big_buck_bunny.webm",
+          "url": "https://www.googleapis.com/storage/v1/b/risemedialibrary-b428b4e8-c8b9-41d5-8a10-b4193c789443/o/Widgets%2Fvideos%2Fbig_buck_bunny.webm?alt=media"
+        },
+        "bubbles": true
+      }));
+    });
+
+    suiteTeardown(function() {
+      RiseVision.VideoFolder.onStorageRefresh.restore();
+    });
+
+    test("Should call onStorageRefresh when files changed", function () {
+      assert(refreshStub.calledOnce);
+    });
+
+  });
+
+  suite("deleted", function() {
+    var refreshStub;
+
+    suiteSetup(function() {
+      refreshStub = sinon.stub(RiseVision.VideoFolder, "onStorageRefresh");
+
+      storage.dispatchEvent(new CustomEvent("rise-storage-response", {
+        "detail": {
+          "deleted": true,
+          "name": "Widgets/videos/big_buck_bunny.webm",
+          "url": "https://www.googleapis.com/storage/v1/b/risemedialibrary-b428b4e8-c8b9-41d5-8a10-b4193c789443/o/Widgets%2Fvideos%2Fbig_buck_bunny.webm?alt=media"
+        },
+        "bubbles": true
+      }));
+    });
+
+    suiteTeardown(function() {
+      RiseVision.VideoFolder.onStorageRefresh.restore();
+    });
+
+    test("Should call onStorageRefresh when files deleted", function () {
+      assert(refreshStub.calledOnce);
+    });
+
+  });
+
+</script>
+</body>
+</html>
