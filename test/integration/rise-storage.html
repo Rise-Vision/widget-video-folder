@@ -29,12 +29,13 @@
 <script src="../../src/widget/main.js"></script>
 
 <script>
-  var storage = document.querySelector("rise-storage");
+  var storage = document.querySelector("rise-storage"),
+    responded = false,
+    listener;
 
   suite("Storage Initialization", function () {
-    // Don't execute tests until rise-storage attributes are set.
     var check = function(done) {
-      if (storage.companyid !== "") {
+      if (responded) {
         done();
       }
       else {
@@ -42,27 +43,38 @@
           check(done)
         }, 1000);
       }
-      },
-      initStub;
+    }, initStub;
 
-    suiteSetup(function (done) {
+    suiteSetup(function() {
+      listener = function(response) {
+        responded = true;
+        storage.removeEventListener("rise-storage-response", listener);
+      };
+
       initStub = sinon.stub(RiseVision.VideoFolder, "onStorageInit", function(urls) {});
-
-      check(done);
+      storage.addEventListener("rise-storage-response", listener);
     });
 
     suiteTeardown(function () {
       RiseVision.VideoFolder.onStorageInit.restore();
     });
 
+    // Don't run the tests until rise-storage-response has fired.
+    setup(function(done) {
+      check(done);
+    });
+
     test("should set folder attribute of storage component", function() {
       assert.equal(storage.folder, "Widgets/videos/");
     });
     test("should set companyid attribute of storage component", function() {
-      assert.equal(storage.companyid, "abc123");
+      assert.equal(storage.companyid, "b428b4e8-c8b9-41d5-8a10-b4193c789443");
     });
     test("should set env attribute of storage component", function() {
       assert.equal(storage.env, config.STORAGE_ENV);
+    });
+    test("should call onStorageInit when initial file added", function () {
+      assert(initStub.calledOnce);
     });
 
   });

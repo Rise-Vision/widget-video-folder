@@ -5,11 +5,11 @@
   window.gadget.settings = {
     "params": {},
     "additionalParams": {
-      "url": "https://www.googleapis.com/storage/v1/b/risemedialibrary-abc123/o?prefix=Widgets%2Fvideos%2F",
+      "url": "https://www.googleapis.com/storage/v1/b/risemedialibrary-b428b4e8-c8b9-41d5-8a10-b4193c789443/o?prefix=Widgets%2Fvideos%2F",
       "storage": {
         "folder": "Widgets/videos/",
         "fileName": "",
-        "companyId": "abc123"
+        "companyId": "b428b4e8-c8b9-41d5-8a10-b4193c789443"
       },
       "video": {
         "scaleToFit": true,

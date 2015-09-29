@@ -155,11 +155,11 @@
     /**
      * Stores item details from the previous request.
      *
-     * @property _items
+     * @property _files
      * @type object
      * @default []
      */
-    _items: [],
+    _files: [],
 
     /**
      * The base URL for Rise Cache.
@@ -336,36 +336,44 @@
      */
     _processStorageResponse: function(e, resp) {
       if (resp && resp.response) {
-        if(resp.response.files) {
-          resp.response.items = resp.response.files;
-          delete resp.response.files;
+        if (this._isEmptyFolder(resp.response)) {
+          this.fire("rise-storage-empty-folder");
         }
-
-        if (this._isLoading) {
-          this._setIsFile(resp.response);
-        }
-
-        if (this._isFile) {
-          if (this._isLoading) {
-            this._setFileUrl(resp.response);
+        else if (this._noFolderExists(resp.response)) {
+          if (this.filename) {
+            this.fire("rise-storage-no-file");
           }
-
-          if (this._isCacheRunning) {
-            this._getFileFromCache();
-          }
-          // Rise Cache is not running.
           else {
-            this._handleStorageFile(resp.response);
+            this.fire("rise-storage-no-folder");
           }
         }
-        // Folder
         else {
-          if (this._isCacheRunning) {
-            this._getFilesFromCache(resp.response);
+          if (this._isLoading) {
+            this._setIsFile(resp.response);
           }
-          // Rise Cache is not running.
+
+          if (this._isFile) {
+            if (this._isLoading) {
+              this._setFileUrl(resp.response);
+            }
+
+            if (this._isCacheRunning) {
+              this._getFileFromCache();
+            }
+            // Rise Cache is not running.
+            else {
+              this._handleStorageFile(resp.response);
+            }
+          }
+          // Folder
           else {
-            this._handleStorageFolder(resp.response);
+            if (this._isCacheRunning) {
+              this._getFilesFromCache(resp.response);
+            }
+            // Rise Cache is not running.
+            else {
+              this._handleStorageFolder(resp.response);
+            }
           }
         }
       }
@@ -394,14 +402,14 @@
         etag = resp.etag;
       }
       // File in a folder.
-      else if ((resp.items !== undefined) && (resp.items.length > 0)) {
-        etag = resp.items[0].etag;
+      else if ((resp.files !== undefined) && (resp.files.length > 0)) {
+        etag = resp.files[0].etag;
       }
 
       file.url = this._fileUrl;
 
       if (this._isLoading) {
-        this._items.push({
+        this._files.push({
           "name": this._getFileNameFromUrl(file.url),
           "etag": etag
         });
@@ -412,13 +420,13 @@
       }
       else {
         // File hasn't changed.
-        if (this._items[0].etag === etag) {
+        if (this._files[0].etag === etag) {
           this._startTimer();
 
           return;
         }
         else {
-          this._items[0].etag = etag;
+          this._files[0].etag = etag;
           file.url += "&cb=" + new Date().getTime();
           file.changed = true;
         }
@@ -440,9 +448,9 @@
         suffix = "?alt=media",
         cb = "&cb=" + new Date().getTime();
 
-      if (resp.items) {
+      if (resp.files) {
         if (this.sort) {
-          resp.items.forEach(function(item) {
+          resp.files.forEach(function(item) {
             // Sorting
             if (self.sort) {
               if (self.sort === "name") {
@@ -454,15 +462,15 @@
             }
           });
 
-          resp.items = this._sortFiles(resp.items);
-          resp.items.forEach(function(item) {
+          resp.files = this._sortFiles(resp.files);
+          resp.files.forEach(function(item) {
             if (self.sort) {
               delete item.sortBy;
             }
           });
         }
 
-        resp.items.forEach(function(item) {
+        resp.files.forEach(function(item) {
           file = {};
 
           // Check that current item is not a folder.
@@ -484,7 +492,7 @@
                   file.url = item.selfLink;
                 }
 
-                self._items.push({
+                self._files.push({
                   "name": self._getFileNameFromUrl(file.url),
                   "etag": item.etag,
                   "url": file.url
@@ -504,13 +512,13 @@
                   file.url = item.selfLink;
                 }
 
-                previousItem = _.find(self._items, function(obj) {
+                previousItem = _.find(self._files, function(obj) {
                   return obj.name === item.name;
                 });
 
                 // New file
                 if (previousItem === undefined) {
-                  self._items.push({
+                  self._files.push({
                     "name": self._getFileNameFromUrl(file.url),
                     "etag": item.etag,
                     "url": file.url
@@ -545,7 +553,7 @@
                 delete file.sortBy;
               }
 
-              if(!file.unchanged) {
+              if (!file.unchanged) {
                 file.name = self._getFileNameFromUrl(file.url);
 
                 self.fire("rise-storage-response", file);
@@ -554,7 +562,7 @@
           }
         });
 
-        this._processRemovedFiles(resp.items);
+        this._processRemovedFiles(resp.files);
         this._isLoading = false;
         this._startTimer();
       }
@@ -584,20 +592,20 @@
     _getFilesFromCache: function(resp) {
       var self = this;
 
-      if (resp.items) {
+      if (resp.files) {
         this._numFiles = 0;
         this._isChanged = false;
         this._totalFilesBefore = this._totalFiles;
 
         // Only count actual files (ignore folders)
-        this._totalFiles = resp.items.filter(function(item) {
+        this._totalFiles = resp.files.filter(function(item) {
           return item.name && (item.name.slice(-1) !== "/");
         }).length;
 
         // Remove no longer existing files
-        this._processRemovedFiles(resp.items);
+        this._processRemovedFiles(resp.files);
 
-        resp.items.forEach(function(item) {
+        resp.files.forEach(function(item) {
           // Check that current item is not a folder.
           if (item.name && (item.name.slice(-1) !== "/")) {
             if (!self._filterFiles(item.contentType)) {
@@ -638,7 +646,7 @@
 
         if (this._isLoading) {
           // Save Last Modified so it can be compared in subsequent requests.
-          this._items.push({
+          this._files.push({
             "name": this._getFileNameFromUrl(file.url),
             "lastModified": lastModified
           });
@@ -653,14 +661,14 @@
         }
         else {
           // Rise Cache file hasn't changed.
-          if (this._items[0].lastModified === lastModified) {
+          if (this._files[0].lastModified === lastModified) {
             file.unchanged = true;
             this._startTimer();
 
             return;
           }
           else {
-            this._items[0].lastModified = lastModified;
+            this._files[0].lastModified = lastModified;
             this.changed = true;
             file.changed = true;
           }
@@ -700,7 +708,7 @@
 
         if (this._isLoading) {
           // Save file details so they can be compared in subsequent requests.
-          this._items.push({
+          this._files.push({
             "name": this._getFileNameFromUrl(file.url),
             "lastModified": lastModified,
             "fullUrl": file.url,
@@ -714,13 +722,13 @@
           }
         }
         else {
-          previousItem = _.find(this._items, function(obj) {
+          previousItem = _.find(this._files, function(obj) {
             return obj.url === url;
           });
 
           // New file
           if (previousItem === undefined) {
-            this._items.push({
+            this._files.push({
               "name": this._getFileNameFromUrl(file.url),
               "lastModified": lastModified,
               "fullUrl": file.url,
@@ -809,11 +817,11 @@
         });
       }
 
-      for(var i = this._items.length - 1; i >= 0; i--) {
-        var file = this._items[i];
+      for(var i = this._files.length - 1; i >= 0; i--) {
+        var file = this._files[i];
 
         if(!fileExists(file)) {
-          this._items.splice(i, 1);
+          this._files.splice(i, 1);
           file.deleted = true;
 
           this.fire("rise-storage-response", file);
@@ -865,6 +873,21 @@
     },
 
     /**
+     * Checks if the request is for a folder that does not exist.
+     */
+    _noFolderExists: function(resp) {
+      return resp.files === undefined;
+    },
+
+    /**
+     * Checks if the request is for an empty folder.
+     */
+    _isEmptyFolder: function(resp) {
+      return (resp.files !== undefined) && (resp.files.length === 1) &&
+        (resp.files[0].name.slice(-1) === "/");
+    },
+
+    /**
      * Checks if the request is for a file.
      */
     _setIsFile: function(response) {
@@ -873,8 +896,8 @@
         this._isFile = true;
       }
       // File in a folder.
-      else if ((response.items !== undefined) && (response.items.length > 0)) {
-        if (response.items.length === 1) {
+      else if ((response.files !== undefined) && (response.files.length > 0)) {
+        if (response.files.length === 1) {
           this._isFile = true;
         }
         else {
@@ -899,8 +922,8 @@
         url = response.selfLink;
       }
       // File in a folder.
-      else if (response.items) {
-        url = response.items[0].selfLink;
+      else if (response.files) {
+        url = response.files[0].selfLink;
       }
 
       if (this._isCacheRunning) {
@@ -1111,7 +1134,7 @@
       this._isFile = true;
       this._cacheUrl = "";
       this._fileUrl = "";
-      this._items = [];
+      this._files = [];
       this._isCacheRunning = false;
       this._pingReceived = false;
       this._numFiles = 0;
