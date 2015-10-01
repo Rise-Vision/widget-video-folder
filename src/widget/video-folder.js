@@ -9,46 +9,78 @@ RiseVision.VideoFolder = (function (gadgets) {
   var _additionalParams;
 
   var _prefs = null,
+    _message = null,
     _storage = null,
     _frameController = null;
 
-  var _initialized = false,
-    _playbackError = false;
+  var _playbackError = false,
+    _viewerPaused = true;
 
-  var _currentFiles, _currentFrame;
+  var _noFilesTimer = null,
+    _noFilesFlag = false;
+
+  var _currentFiles = [],
+    _currentFrame = 0;
 
   /*
    *  Private Methods
    */
+  function _clearNoFilesTimer() {
+    clearTimeout(_noFilesTimer);
+    _noFilesTimer = null;
+  }
+
   function _done() {
     gadgets.rpc.call("", "rsevent_done", null, _prefs.getString("id"));
   }
 
   function _ready() {
-    console.log("video-folder.js::_ready()", _additionalParams.storage.folder);
-
     gadgets.rpc.call("", "rsevent_ready", null, _prefs.getString("id"),
       true, true, true, true, true);
+  }
+
+  function _startNoFilesTimer() {
+    _clearNoFilesTimer();
+
+    _noFilesTimer = setTimeout(function () {
+      // notify Viewer widget is done
+      _done();
+    }, 5000);
   }
 
   /*
    *  Public Methods
    */
+  function noFiles(type) {
+    _noFilesFlag = true;
+    _currentFiles = [];
+
+    if (type === "empty") {
+      _message.show("The selected folder does not contain any videos.");
+    } else if (type === "noexist") {
+      _message.show("The selected folder does not exist.");
+    }
+
+    _frameController.remove(_currentFrame, function () {
+      // if Widget is playing right now, run the timer
+      if (!_viewerPaused) {
+        _startNoFilesTimer();
+      }
+    });
+
+  }
+
   function onStorageInit(urls) {
-    console.log("video-folder.js::onStorageInit", urls);
     _currentFiles = urls;
 
-    // create the FrameController module instance
-    _frameController = new RiseVision.Common.Video.FrameController();
+    _message.hide();
 
-    _currentFrame = 0;
-    _initialized = true;
-
-    _ready();
+    if (!_viewerPaused) {
+      play();
+    }
   }
 
   function onStorageRefresh(urls) {
-    console.log("video-folder.js::onStorageRefresh", urls);
     _currentFiles = urls;
 
     // in case refreshed files fix an error with previous setup or initial file problem,
@@ -59,6 +91,13 @@ RiseVision.VideoFolder = (function (gadgets) {
   function pause() {
     var frameObj = _frameController.getFrameObject(_currentFrame);
 
+    _viewerPaused = true;
+
+    if (_noFilesFlag) {
+      _clearNoFilesTimer();
+      return;
+    }
+
     if (frameObj) {
       frameObj.pause();
     }
@@ -66,6 +105,13 @@ RiseVision.VideoFolder = (function (gadgets) {
 
   function play() {
     var frameObj = _frameController.getFrameObject(_currentFrame);
+
+    _viewerPaused = false;
+
+    if (_noFilesFlag) {
+      _startNoFilesTimer();
+      return;
+    }
 
     if (!_playbackError) {
       if (frameObj) {
@@ -79,8 +125,6 @@ RiseVision.VideoFolder = (function (gadgets) {
           _frameController.add(0);
           _frameController.createFramePlayer(0, _additionalParams, _currentFiles, config.SKIN, "player.html");
 
-        } else {
-          _done();
         }
 
       }
@@ -101,9 +145,20 @@ RiseVision.VideoFolder = (function (gadgets) {
         _additionalParams.width = _prefs.getInt("rsW");
         _additionalParams.height = _prefs.getInt("rsH");
 
+        _message = new RiseVision.Common.Message(document.getElementById("videoContainer"),
+          document.getElementById("messageContainer"));
+
+        // show wait message while Storage initializes
+        _message.show("Please wait while your video is downloaded.");
+
+        // create the FrameController module instance
+        _frameController = new RiseVision.Common.Video.FrameController();
+
         // create and initialize the Storage module instance
         _storage = new RiseVision.VideoFolder.Storage(_additionalParams);
         _storage.init();
+
+        _ready();
       }
     }
   }
@@ -115,8 +170,10 @@ RiseVision.VideoFolder = (function (gadgets) {
   }
 
   function playerReady() {
-    var frameObj = _frameController.getFrameObject(_currentFrame);
-    frameObj.play();
+    if (!_viewerPaused) {
+      var frameObj = _frameController.getFrameObject(_currentFrame);
+      frameObj.play();
+    }
   }
 
   function playerError(error) {
@@ -141,6 +198,7 @@ RiseVision.VideoFolder = (function (gadgets) {
     "pause": pause,
     "play": play,
     "setAdditionalParams": setAdditionalParams,
+    "noFiles": noFiles,
     "playerEnded": playerEnded,
     "playerReady": playerReady,
     "playerError": playerError,

@@ -48,6 +48,14 @@ RiseVision.VideoFolder.Storage = function (data) {
     }
   }
 
+  function _handleEmptyFolder() {
+    RiseVision.VideoFolder.noFiles("empty");
+  }
+
+  function _handleNoFolder() {
+    RiseVision.VideoFolder.noFiles("noexist");
+  }
+
   /*
    *  Public Methods
    */
@@ -58,6 +66,8 @@ RiseVision.VideoFolder.Storage = function (data) {
       return;
     }
 
+    storage.addEventListener("rise-storage-empty-folder", _handleEmptyFolder);
+    storage.addEventListener("rise-storage-no-folder", _handleNoFolder);
     storage.addEventListener("rise-storage-response", function(e) {
       var file = e.detail;
 
