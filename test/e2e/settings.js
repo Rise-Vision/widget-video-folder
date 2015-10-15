@@ -93,7 +93,7 @@
       expect(element(by.model("settings.additionalParams.video.autoplay")).isDisplayed()).to.eventually.be.false;
     });
 
-    it("Should correctly save settings", function (done) {
+    it("Should correctly save settings", function () {
       var settings = {
         params: {},
         additionalParams: {

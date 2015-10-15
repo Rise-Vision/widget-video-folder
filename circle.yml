@@ -1,4 +1,6 @@
 machine:
+  node:
+    version: 0.12.2
   environment:
     awscli: $HOME/aws/bin/aws
 dependencies:

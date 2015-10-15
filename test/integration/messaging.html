@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <title>Video Folder Widget</title>
+
+  <script src="../../src/components/webcomponentsjs/webcomponents-lite.min.js"></script>
+  <script src="../../src/components/web-component-tester/browser.js"></script>
+
+  <link rel="import" href="../../src/components/rise-storage/rise-storage.html">
+
+  <link rel="stylesheet" type="text/css" href="../../src/widget/css/video-folder.css">
+  <link rel="stylesheet" type="text/css" href="../../src/components/widget-common/dist/css/video-frame.css">
+  <link rel="stylesheet" href="../../src/components/widget-common/dist/css/message.css">
+</head>
+<body>
+
+<rise-storage id="videoFolderStorage" refresh="5" fileType="video"></rise-storage>
+
+<div id="videoContainer">
+  <div id="if_0" class="frameContainer"></div>
+</div>
+
+<div id="messageContainer"></div>
+
+<script src="../data/no-storage.js"></script>
+
+<script src="../../node_modules/widget-tester/mocks/gadget-mocks.js"></script>
+
+<script src="../../src/config/test.js"></script>
+<script src="../../src/widget/video-folder.js"></script>
+<script src="../../src/widget/storage.js"></script>
+<script src="../../src/components/widget-common/dist/video.js"></script>
+<script src="../../src/components/widget-common/dist/message.js"></script>
+<script src="../../src/widget/main.js"></script>
+
+<script>
+
+  suite("messaging", function () {
+    var storage = document.querySelector("rise-storage");
+
+    suite("waiting", function() {
+      test("should show waiting message", function() {
+        assert.equal(document.querySelector(".message").innerHTML, "Please wait while your video is downloaded.", "message is correct");
+      });
+    });
+
+    suite("no folder", function () {
+      suiteSetup(function() {
+        storage.dispatchEvent(new CustomEvent("rise-storage-no-folder", {
+          "detail": null,
+          "bubbles": true
+        }));
+      });
+
+      test("should show no folder message", function() {
+        assert.equal(document.querySelector(".message").innerHTML, "The selected folder does not exist.", "message is correct");
+      });
+    });
+
+    suite("empty folder", function () {
+      suiteSetup(function() {
+        storage.dispatchEvent(new CustomEvent("rise-storage-empty-folder", {
+          "detail": null,
+          "bubbles": true
+        }));
+      });
+
+      test("should show empty folder message", function() {
+        assert.equal(document.querySelector(".message").innerHTML, "The selected folder does not contain any videos.");
+      });
+    });
+  });
+
+  suite("normal storage response", function () {
+    suiteSetup(function() {
+      storage.dispatchEvent(new CustomEvent("rise-storage-response", {
+        "detail": {
+          "added": true,
+          "name": "Widgets/videos/big_buck_bunny.webm",
+          "url": "https://www.googleapis.com/storage/v1/b/risemedialibrary-b428b4e8-c8b9-41d5-8a10-b4193c789443/o/Widgets%2Fvideos%2Fbig_buck_bunny.webm?alt=media"
+        },
+        "bubbles": true
+      }));
+    });
+
+    test("should not show a message", function () {
+      assert.isTrue((document.getElementById("videoContainer").style.visibility === "visible"), "video container is showing");
+      assert.isTrue((document.getElementById("messageContainer").style.display === "none"), "message container is hidden");
+    });
+  });
+
+</script>
+</body>
+</html>

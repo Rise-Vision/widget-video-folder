@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/Rise-Vision/widget-video-folder",
   "devDependencies": {
+    "bower": "^1.5.3",
     "chai": "~1.9.2",
     "chai-as-promised": "~4.1.1",
     "colors": "~1.0.3",
@@ -37,10 +38,8 @@
     "gulp-util": "~2.2.17",
     "gulp-watch": "^0.6.8",
     "jshint-stylish": "^0.2.0",
-    "mocha": "~1.20.1",
     "phantomjs": "^1.9.7-9",
-    "protractor": "~1.0.0",
     "web-component-tester": "*",
-    "widget-tester": "git://github.com/Rise-Vision/widget-tester.git"
+    "widget-tester": "git://github.com/Rise-Vision/widget-tester.git#0.1.0"
   }
 }
